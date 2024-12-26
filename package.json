@@ -8,10 +8,12 @@
     "build": "vite build"
   },
   "devDependencies": {
+    "eslint": "^9.17.0",
     "vite": "^4.5.0"
   },
   "dependencies": {
     "lil-gui": "^0.19.0",
-    "three": "^0.158.0"
+    "three": "^0.160.0",
+    "vite-plugin-glsl": "^1.3.1"
   }
 }

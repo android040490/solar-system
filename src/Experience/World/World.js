@@ -15,6 +15,7 @@ export default class World {
   }
 
   update() {
+    this.sun?.update();
     this.earth?.update();
   }
 }

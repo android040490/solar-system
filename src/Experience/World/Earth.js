@@ -11,7 +11,7 @@ export default class Earth {
   cloudsIntencity = 0.5;
 
   constructor() {
-    this.spherical = new THREE.Spherical(5, Math.PI * 0.5, 0.5);
+    this.spherical = new THREE.Spherical(15, Math.PI * 0.5, 0.5);
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;

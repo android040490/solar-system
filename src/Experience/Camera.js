@@ -22,7 +22,7 @@ export default class Camera {
       100,
     );
 
-    this.instance.position.set(6, 4, 8);
+    this.instance.position.set(12, 5, 4);
     this.scene.add(this.instance);
   }
 

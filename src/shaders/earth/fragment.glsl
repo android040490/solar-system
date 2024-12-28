@@ -1,7 +1,7 @@
 uniform sampler2D uDayTexture;
 uniform sampler2D uNightTexture;
 uniform sampler2D uSpecularCloudsTexture;
-uniform vec3 uSunDirection;
+uniform vec3 uSunPosition;
 uniform vec3 uAtmosphereDayColor;
 uniform vec3 uAtmosphereTwilightColor;
 uniform float uCloudsIntencity;
@@ -17,7 +17,8 @@ void main()
     vec3 color = vec3(0.0);
 
     // Sun orientation
-    float sunOrientation = dot(normal, uSunDirection);
+    vec3 sunDirection = normalize(uSunPosition - vPosition);
+    float sunOrientation = dot(normal, sunDirection);
 
     // Day / Night color
     float dayMix = smoothstep(- 0.25, 0.5, sunOrientation); //light coefficient
@@ -46,7 +47,7 @@ void main()
     color = mix(color, atmosphereColor * atmosphereDayMix, fresnel);
 
     // Specular
-    vec3 reflection = reflect(- uSunDirection, normal);
+    vec3 reflection = reflect(- sunDirection, normal);
     float specular = - dot(viewDirection, reflection);
     specular = max(specular, 0.0);
     specular = pow(specular, 32.0);

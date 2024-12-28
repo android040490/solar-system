@@ -1,5 +1,6 @@
 import Experience from "../Experience";
 import Earth from "./Earth";
+import Sun from "./Sun";
 
 export default class World {
   constructor() {
@@ -8,6 +9,7 @@ export default class World {
     this.resources = this.experience.resources;
 
     this.resources.on("ready", () => {
+      this.sun = new Sun();
       this.earth = new Earth();
     });
   }

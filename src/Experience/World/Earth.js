@@ -6,18 +6,18 @@ import atmosphereVertexShader from "../../shaders/atmosphere/vertex.glsl";
 import atmosphereFragmentShader from "../../shaders/atmosphere/fragment.glsl";
 
 export default class Earth {
-  earthParameters = {
-    atmosphereDayColor: "#00aaff",
-    atmosphereTwilightColor: "#ff6600",
-    cloudsIntencity: 0.5,
-  };
+  atmosphereDayColor = "#00aaff";
+  atmosphereTwilightColor = "#ff6600";
+  cloudsIntencity = 0.5;
 
   constructor() {
+    this.spherical = new THREE.Spherical(5, Math.PI * 0.5, 0.5);
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
     this.time = this.experience.time;
     this.debug = this.experience.debug;
+    this.sunPosition = this.experience.world.sun.mesh.position;
 
     // Debug
     if (this.debug.active) {
@@ -55,16 +55,14 @@ export default class Earth {
         uSpecularCloudsTexture: new THREE.Uniform(
           this.earthSpecularCloudsTexture,
         ),
-        uSunDirection: new THREE.Uniform(new THREE.Vector3(0, 0, 1)),
+        uSunPosition: new THREE.Uniform(this.sunPosition),
         uAtmosphereDayColor: new THREE.Uniform(
-          new THREE.Color(this.earthParameters.atmosphereDayColor),
+          new THREE.Color(this.atmosphereDayColor),
         ),
         uAtmosphereTwilightColor: new THREE.Uniform(
-          new THREE.Color(this.earthParameters.atmosphereTwilightColor),
+          new THREE.Color(this.atmosphereTwilightColor),
         ),
-        uCloudsIntencity: new THREE.Uniform(
-          this.earthParameters.cloudsIntencity,
-        ),
+        uCloudsIntencity: new THREE.Uniform(this.cloudsIntencity),
       },
     });
 
@@ -72,12 +70,12 @@ export default class Earth {
       vertexShader: atmosphereVertexShader,
       fragmentShader: atmosphereFragmentShader,
       uniforms: {
-        uSunDirection: new THREE.Uniform(new THREE.Vector3(0, 0, 1)),
+        uSunPosition: new THREE.Uniform(this.sunPosition),
         uAtmosphereDayColor: new THREE.Uniform(
-          new THREE.Color(this.earthParameters.atmosphereDayColor),
+          new THREE.Color(this.atmosphereDayColor),
         ),
         uAtmosphereTwilightColor: new THREE.Uniform(
-          new THREE.Color(this.earthParameters.atmosphereTwilightColor),
+          new THREE.Color(this.atmosphereTwilightColor),
         ),
       },
       side: THREE.BackSide,
@@ -92,43 +90,57 @@ export default class Earth {
       this.atmosphereMaterial,
     );
     this.atmosphereMesh.scale.set(1.04, 1.04, 1.04);
+    this.mesh.position.setFromSpherical(this.spherical);
+    this.atmosphereMesh.position.setFromSpherical(this.spherical);
     this.scene.add(this.mesh).add(this.atmosphereMesh);
   }
 
   update() {
-    this.mesh.rotation.y = this.time.elapsed * 0.00001;
+    this.mesh.rotation.y = this.time.elapsed * 0.0001;
   }
 
   setDebug() {
     this.debugFolder = this.debug.ui.addFolder("Earth");
+    this.debugFolder.addColor(this, "atmosphereDayColor").onChange(() => {
+      this.material.uniforms.uAtmosphereDayColor.value.set(
+        this.atmosphereDayColor,
+      );
+      this.atmosphereMaterial.uniforms.uAtmosphereDayColor.value.set(
+        this.atmosphereDayColor,
+      );
+    });
+    this.debugFolder.addColor(this, "atmosphereTwilightColor").onChange(() => {
+      this.material.uniforms.uAtmosphereTwilightColor.value.set(
+        this.atmosphereTwilightColor,
+      );
+      this.atmosphereMaterial.uniforms.uAtmosphereTwilightColor.value.set(
+        this.atmosphereTwilightColor,
+      );
+    });
     this.debugFolder
-      .addColor(this.earthParameters, "atmosphereDayColor")
-      .onChange(() => {
-        this.material.uniforms.uAtmosphereDayColor.value.set(
-          this.earthParameters.atmosphereDayColor,
-        );
-        this.atmosphereMaterial.uniforms.uAtmosphereDayColor.value.set(
-          this.earthParameters.atmosphereDayColor,
-        );
-      });
-    this.debugFolder
-      .addColor(this.earthParameters, "atmosphereTwilightColor")
-      .onChange(() => {
-        this.material.uniforms.uAtmosphereTwilightColor.value.set(
-          this.earthParameters.atmosphereTwilightColor,
-        );
-        this.atmosphereMaterial.uniforms.uAtmosphereTwilightColor.value.set(
-          this.earthParameters.atmosphereTwilightColor,
-        );
-      });
-    this.debugFolder
-      .add(this.earthParameters, "cloudsIntencity")
+      .add(this, "cloudsIntencity")
       .min(0)
       .max(1)
       .step(0.01)
       .onChange(() => {
-        this.material.uniforms.uCloudsIntencity.value =
-          this.earthParameters.cloudsIntencity;
+        this.material.uniforms.uCloudsIntencity.value = this.cloudsIntencity;
       });
+    this.debugFolder
+      .add(this.spherical, "phi")
+      .min(0)
+      .max(Math.PI)
+      .step(0.001)
+      .onChange(() => this.updatePosition());
+    this.debugFolder
+      .add(this.spherical, "theta")
+      .min(-Math.PI)
+      .max(Math.PI)
+      .step(0.001)
+      .onChange(() => this.updatePosition());
+  }
+
+  updatePosition() {
+    this.mesh.position.setFromSpherical(this.spherical);
+    this.atmosphereMesh.position.setFromSpherical(this.spherical);
   }
 }

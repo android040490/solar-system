@@ -7,6 +7,7 @@ import World from "./World/World";
 import Resources from "./Utils/Resources";
 import sources from "./sources";
 import Debug from "./Utils/Debug";
+import Navigator from "./World/Navigator";
 
 let instance = null;
 
@@ -31,6 +32,7 @@ export default class Experience {
     this.camera = new Camera();
     this.renderer = new Renderer();
     this.world = new World();
+    this.navigation = new Navigator();
 
     // Sizes resize event
     this.sizes.on("resize", () => {

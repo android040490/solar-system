@@ -11,9 +11,10 @@ export default class Earth {
   cloudsIntencity = 0.5;
 
   constructor() {
-    this.spherical = new THREE.Spherical(15, Math.PI * 0.5, 0.5);
+    this.spherical = new THREE.Spherical(20, Math.PI * 0.5, Math.PI * 0.5);
     this.experience = new Experience();
     this.scene = this.experience.scene;
+    this.navigation = this.experience.navigation;
     this.resources = this.experience.resources;
     this.time = this.experience.time;
     this.debug = this.experience.debug;
@@ -137,10 +138,15 @@ export default class Earth {
       .max(Math.PI)
       .step(0.001)
       .onChange(() => this.updatePosition());
+    this.debugFolder.add(this, "navigateTo").name("Navigate to Earth");
   }
 
   updatePosition() {
     this.mesh.position.setFromSpherical(this.spherical);
     this.atmosphereMesh.position.setFromSpherical(this.spherical);
+  }
+
+  navigateTo() {
+    this.navigation.navigateTo(this.mesh, { x: 0, y: 0, z: 10 });
   }
 }

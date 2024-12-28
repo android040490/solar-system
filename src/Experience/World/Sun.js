@@ -9,7 +9,13 @@ export default class Sun {
     this.scene = this.experience.scene;
     this.time = this.experience.time;
     this.resources = this.experience.resources;
+    this.debug = this.experience.debug;
+    this.navigation = this.experience.navigation;
 
+    // Debug
+    if (this.debug.active) {
+      this.setDebug();
+    }
     this.setGeometry();
     this.setTexture();
     this.setMaterial();
@@ -17,7 +23,7 @@ export default class Sun {
   }
 
   setGeometry() {
-    this.geometry = new THREE.IcosahedronGeometry(5, 62);
+    this.geometry = new THREE.IcosahedronGeometry(10, 62);
   }
 
   setTexture() {
@@ -54,5 +60,15 @@ export default class Sun {
 
   update() {
     this.material.uniforms.time.value += 0.0005 * this.time.delta;
+  }
+
+  setDebug() {
+    this.debugFolder = this.debug.ui.addFolder("Sun");
+
+    this.debugFolder.add(this, "navigateTo").name("Navigate to Sun");
+  }
+
+  navigateTo() {
+    this.navigation.navigateTo(this.mesh, { x: 0, y: 0, z: 35 });
   }
 }

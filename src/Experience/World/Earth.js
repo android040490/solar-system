@@ -6,6 +6,7 @@ import atmosphereVertexShader from "../../shaders/atmosphere/vertex.glsl";
 import atmosphereFragmentShader from "../../shaders/atmosphere/fragment.glsl";
 
 export default class Earth {
+  name = "Earth";
   atmosphereDayColor = "#00aaff";
   atmosphereTwilightColor = "#ff6600";
   cloudsIntencity = 0.5;
@@ -35,7 +36,6 @@ export default class Earth {
   }
 
   setTextures() {
-    this.resource = this.resources.items.foxModel;
     this.earthDayTexture = this.resources.items.earthDay;
     this.earthDayTexture.colorSpace = THREE.SRGBColorSpace;
     this.earthDayTexture.anisotropy = 8;
@@ -138,7 +138,6 @@ export default class Earth {
       .max(Math.PI)
       .step(0.001)
       .onChange(() => this.updatePosition());
-    this.debugFolder.add(this, "navigateTo").name("Navigate to Earth");
   }
 
   updatePosition() {

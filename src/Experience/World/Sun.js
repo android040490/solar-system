@@ -4,6 +4,8 @@ import vertexShader from "../../shaders/sun/vertex.glsl";
 import fragmentShader from "../../shaders/sun/fragment.glsl";
 
 export default class Sun {
+  name = "Sun";
+
   constructor() {
     this.experience = new Experience();
     this.scene = this.experience.scene;
@@ -12,10 +14,6 @@ export default class Sun {
     this.debug = this.experience.debug;
     this.navigation = this.experience.navigation;
 
-    // Debug
-    if (this.debug.active) {
-      this.setDebug();
-    }
     this.setGeometry();
     this.setTexture();
     this.setMaterial();
@@ -60,12 +58,6 @@ export default class Sun {
 
   update() {
     this.material.uniforms.time.value += 0.0005 * this.time.delta;
-  }
-
-  setDebug() {
-    this.debugFolder = this.debug.ui.addFolder("Sun");
-
-    this.debugFolder.add(this, "navigateTo").name("Navigate to Sun");
   }
 
   navigateTo() {

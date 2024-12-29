@@ -7,8 +7,8 @@ import {
   RenderPass,
   EffectComposer,
 } from "three/examples/jsm/Addons.js";
-import vertexShader from "../shaders/bloompass/vertex.glsl";
-import fragmentShader from "../shaders/bloompass/fragment.glsl";
+import vertexShader from "../shaders/bloomPass/vertex.glsl";
+import fragmentShader from "../shaders/bloomPass/fragment.glsl";
 
 export const BLOOM_SCENE = 1;
 

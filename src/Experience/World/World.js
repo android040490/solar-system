@@ -5,12 +5,14 @@ import Planet from "./Planet";
 import Sun from "./Sun";
 
 export default class World {
-  bodies = [];
+  spaceObjects = [];
+
   constructor() {
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
     this.debug = this.experience.debug;
+    this.navigation = this.experience.navigation;
 
     this.resources.on("ready", () => {
       this.setup();
@@ -22,7 +24,7 @@ export default class World {
 
     this.sun = new Sun();
     this.earth = new Earth();
-    this.bodies = [
+    this.spaceObjects = [
       this.sun,
       this.earth,
       new Planet({
@@ -30,7 +32,7 @@ export default class World {
         radius: 1.06,
         texture: this.resources.items.marsDay,
         distanceToSun: 30,
-        cameraOffset: { x: 0, y: 0, z: 10 },
+        pointOfView: { x: 0, y: 0, z: 10 },
       }),
     ];
 
@@ -41,14 +43,19 @@ export default class World {
 
   setDebug() {
     this.debugFolder = this.debug.ui.addFolder("Navigation");
-    this.bodies.forEach((body) => {
-      this.debugFolder.add(body, "navigateTo").name(body.name);
+    this.spaceObjects.forEach((spaceObject) => {
+      const obj = {
+        navigateTo: () => {
+          this.navigation.navigateTo(spaceObject);
+        },
+      };
+      this.debugFolder.add(obj, "navigateTo").name(spaceObject.name);
     });
   }
 
   update() {
-    this.bodies.forEach((body) => {
-      body.update();
+    this.spaceObjects.forEach((spaceObject) => {
+      spaceObject.update();
     });
   }
 }

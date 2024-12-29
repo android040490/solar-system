@@ -13,12 +13,13 @@ export default class Navigator {
     );
   }
 
-  navigateTo(mesh, offset = { x: 0, y: 0, z: 0 }) {
+  navigateTo(spaceObject) {
+    const { mesh, pointOfView } = spaceObject;
     const tl = gsap.timeline();
     const newCameraDirection = mesh.position.clone();
     const newCameraPosition = newCameraDirection
       .clone()
-      .add(new THREE.Vector3(offset.x, offset.y, offset.z));
+      .add(new THREE.Vector3(pointOfView.x, pointOfView.y, pointOfView.z));
 
     tl.to(this.camera.position, {
       x: newCameraPosition.x,

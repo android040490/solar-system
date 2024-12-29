@@ -5,6 +5,7 @@ import fragmentShader from "../../shaders/sun/fragment.glsl";
 
 export default class Sun {
   name = "Sun";
+  pointOfView = { x: 0, y: 0, z: 35 };
 
   constructor() {
     this.experience = new Experience();
@@ -58,9 +59,5 @@ export default class Sun {
 
   update() {
     this.material.uniforms.time.value += 0.0005 * this.time.delta;
-  }
-
-  navigateTo() {
-    this.navigation.navigateTo(this.mesh, { x: 0, y: 0, z: 35 });
   }
 }

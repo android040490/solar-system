@@ -7,28 +7,28 @@ import atmosphereFragmentShader from "../../shaders/atmosphere/fragment.glsl";
 
 export default class Earth {
   name = "Earth";
+  pointOfView = { x: 0, y: 0, z: 10 };
   atmosphereDayColor = "#00aaff";
   atmosphereTwilightColor = "#ff6600";
   cloudsIntencity = 0.5;
+  distanceToSun = 20;
 
   constructor() {
-    this.spherical = new THREE.Spherical(20, Math.PI * 0.5, Math.PI * 0.5);
     this.experience = new Experience();
     this.scene = this.experience.scene;
-    this.navigation = this.experience.navigation;
     this.resources = this.experience.resources;
     this.time = this.experience.time;
     this.debug = this.experience.debug;
     this.sunPosition = this.experience.world.sun.mesh.position;
 
-    // Debug
-    if (this.debug.active) {
-      this.setDebug();
-    }
     this.setGeometry();
     this.setTextures();
     this.setMaterial();
     this.setMesh();
+
+    if (this.debug.active) {
+      this.setDebug();
+    }
   }
 
   setGeometry() {
@@ -85,6 +85,11 @@ export default class Earth {
   }
 
   setMesh() {
+    this.spherical = new THREE.Spherical(
+      this.distanceToSun,
+      Math.PI * 0.5,
+      Math.PI * 0.5,
+    );
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.atmosphereMesh = new THREE.Mesh(
       this.geometry,
@@ -143,9 +148,5 @@ export default class Earth {
   updatePosition() {
     this.mesh.position.setFromSpherical(this.spherical);
     this.atmosphereMesh.position.setFromSpherical(this.spherical);
-  }
-
-  navigateTo() {
-    this.navigation.navigateTo(this.mesh, { x: 0, y: 0, z: 10 });
   }
 }

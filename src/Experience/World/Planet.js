@@ -3,16 +3,15 @@ import Experience from "../Experience";
 
 export default class Planet {
   constructor(options) {
-    const { name, radius, texture, distanceToSun, cameraOffset } = options;
+    const { name, radius, texture, distanceToSun, pointOfView } = options;
     this.name = name;
     this.radius = radius;
     this.texture = texture;
     this.distanceToSun = distanceToSun;
-    this.cameraOffset = cameraOffset;
+    this.pointOfView = pointOfView;
 
     this.experience = new Experience();
     this.scene = this.experience.scene;
-    this.navigation = this.experience.navigation;
     this.resources = this.experience.resources;
     this.time = this.experience.time;
 
@@ -50,9 +49,5 @@ export default class Planet {
 
   update() {
     this.mesh.rotation.y = this.time.elapsed * 0.0001;
-  }
-
-  navigateTo() {
-    this.navigation.navigateTo(this.mesh, this.cameraOffset);
   }
 }

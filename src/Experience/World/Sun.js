@@ -2,6 +2,7 @@ import * as THREE from "three";
 import Experience from "../Experience";
 import vertexShader from "../../shaders/sun/vertex.glsl";
 import fragmentShader from "../../shaders/sun/fragment.glsl";
+import { BLOOM_SCENE } from "../Renderer";
 
 export default class Sun {
   name = "Sun";
@@ -55,6 +56,7 @@ export default class Sun {
   setMesh() {
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
+    this.mesh.layers.enable(BLOOM_SCENE);
   }
 
   update() {

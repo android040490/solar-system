@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Stats from "stats.js";
 import Sizes from "./Utils/Sizes";
 import Time from "./Utils/Time";
 import Camera from "./Camera";
@@ -43,6 +44,10 @@ export default class Experience {
     this.time.on("tick", () => {
       this.update();
     });
+
+    if (this.debug.active) {
+      this.setDebug();
+    }
   }
 
   resize() {
@@ -51,9 +56,15 @@ export default class Experience {
   }
 
   update() {
+    if (this.debug.active) {
+      this.stats.begin();
+    }
     this.camera.update();
     this.world.update();
     this.renderer.update();
+    if (this.debug.active) {
+      this.stats.end();
+    }
   }
 
   destroy() {
@@ -80,5 +91,11 @@ export default class Experience {
     if (this.debug.active) {
       this.debug.ui.destroy();
     }
+  }
+
+  setDebug() {
+    this.stats = new Stats();
+    this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild(this.stats.dom);
   }
 }

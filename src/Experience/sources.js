@@ -17,9 +17,14 @@ export default [
   { name: "sunLava", type: "texture", path: "textures/sun/lavatile.jpg" },
   { name: "sunCloud", type: "texture", path: "textures/sun/cloud.png" },
   {
-    name: "marsDay",
+    name: "mars",
     type: "texture",
     path: "textures/planets/mars/mars_2k.jpg",
+  },
+  {
+    name: "mercury",
+    type: "texture",
+    path: "textures/planets/mercury/mercury_2k.jpg",
   },
   {
     name: "environmentMap",

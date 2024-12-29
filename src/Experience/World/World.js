@@ -26,12 +26,19 @@ export default class World {
     this.earth = new Earth();
     this.spaceObjects = [
       this.sun,
+      new Planet({
+        name: "Mercury",
+        radius: 0.76,
+        texture: this.resources.items.mercury,
+        distanceToSun: 15,
+        pointOfView: { x: 0, y: 0, z: 7 },
+      }),
       this.earth,
       new Planet({
         name: "Mars",
         radius: 1.06,
-        texture: this.resources.items.marsDay,
-        distanceToSun: 30,
+        texture: this.resources.items.mars,
+        distanceToSun: 50,
         pointOfView: { x: 0, y: 0, z: 10 },
       }),
     ];

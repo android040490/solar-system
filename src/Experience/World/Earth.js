@@ -11,7 +11,7 @@ export default class Earth {
   atmosphereDayColor = "#00aaff";
   atmosphereTwilightColor = "#ff6600";
   cloudsIntencity = 0.5;
-  distanceToSun = 20;
+  distanceToSun = 40;
 
   constructor() {
     this.experience = new Experience();

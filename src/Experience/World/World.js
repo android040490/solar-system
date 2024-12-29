@@ -33,6 +33,13 @@ export default class World {
         distanceToSun: 15,
         pointOfView: { x: 0, y: 0, z: 7 },
       }),
+      new Planet({
+        name: "Venus",
+        radius: 1.89,
+        texture: this.resources.items.venusSurface,
+        distanceToSun: 25,
+        pointOfView: { x: 0, y: 0, z: 10 },
+      }),
       this.earth,
       new Planet({
         name: "Mars",

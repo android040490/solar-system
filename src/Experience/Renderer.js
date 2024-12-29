@@ -87,15 +87,17 @@ export default class Renderer {
 
     const outputPass = new OutputPass();
 
-    this.composer = new EffectComposer(this.instance);
-    this.composer.addPass(scenePass);
-    this.composer.addPass(mixPass);
-    this.composer.addPass(outputPass);
+    this.finalComposer = new EffectComposer(this.instance);
+    this.finalComposer.addPass(scenePass);
+    this.finalComposer.addPass(mixPass);
+    this.finalComposer.addPass(outputPass);
   }
 
   resize() {
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(this.sizes.pixelRatio);
+    this.bloomComposer.setSize(this.sizes.width, this.sizes.height);
+    this.finalComposer.setSize(this.sizes.width, this.sizes.height);
   }
 
   darkenNonBloomed(obj) {
@@ -144,7 +146,7 @@ export default class Renderer {
       this.scene.traverse(this.darkenNonBloomed);
       this.bloomComposer.render();
       this.scene.traverse(this.restoreMaterial);
-      this.composer.render();
+      this.finalComposer.render();
     } else {
       this.instance.render(this.scene, this.camera.instance);
     }

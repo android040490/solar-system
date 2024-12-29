@@ -30,33 +30,33 @@ export default class World {
         radius: 0.38,
         texture: this.resources.items.mercury,
         distanceToSun: 35,
-        pointOfView: { x: 0, y: 0, z: 7 },
+        pointOfView: { x: 0, y: 0, z: 3 },
       }),
       new Planet({
         name: "Venus",
         radius: 0.94,
         texture: this.resources.items.venusSurface,
         distanceToSun: 45,
-        pointOfView: { x: 0, y: 0, z: 10 },
+        pointOfView: { x: 0, y: 0, z: 5 },
       }),
       new Earth({
         radius: 1,
         distanceToSun: 55,
-        pointOfView: { x: 0, y: 0, z: 10 },
+        pointOfView: { x: 0, y: 0, z: 5 },
       }),
       new Planet({
         name: "Mars",
         radius: 0.53,
         texture: this.resources.items.mars,
         distanceToSun: 65,
-        pointOfView: { x: 0, y: 0, z: 10 },
+        pointOfView: { x: 0, y: 0, z: 5 },
       }),
       new Planet({
         name: "Jupiter",
         radius: 10.96,
         texture: this.resources.items.jupiter,
         distanceToSun: 90,
-        pointOfView: { x: 0, y: 0, z: 60 },
+        pointOfView: { x: 0, y: 0, z: 30 },
       }),
     ];
 

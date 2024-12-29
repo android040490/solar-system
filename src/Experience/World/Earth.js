@@ -7,13 +7,16 @@ import atmosphereFragmentShader from "../../shaders/atmosphere/fragment.glsl";
 
 export default class Earth {
   name = "Earth";
-  pointOfView = { x: 0, y: 0, z: 10 };
   atmosphereDayColor = "#00aaff";
   atmosphereTwilightColor = "#ff6600";
   cloudsIntencity = 0.5;
-  distanceToSun = 40;
 
-  constructor() {
+  constructor(options) {
+    const { radius, distanceToSun, pointOfView } = options;
+    this.radius = radius;
+    this.distanceToSun = distanceToSun;
+    this.pointOfView = pointOfView;
+
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
@@ -32,7 +35,7 @@ export default class Earth {
   }
 
   setGeometry() {
-    this.geometry = new THREE.SphereGeometry(1, 64, 64);
+    this.geometry = new THREE.SphereGeometry(this.radius, 64, 64);
   }
 
   setTextures() {

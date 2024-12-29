@@ -27,10 +27,11 @@ export default class Navigator {
       z: newCameraPosition.z,
       duration: 2,
       onUpdate: () => {
+        const alpha = tl.progress();
         const vectorToLookAt = new THREE.Vector3().lerpVectors(
           this.currentCameraDirection,
           newCameraDirection,
-          tl.progress(),
+          alpha,
         );
         this.controls.target = vectorToLookAt;
       },

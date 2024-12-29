@@ -5,7 +5,7 @@ import fragmentShader from "../../shaders/sun/fragment.glsl";
 
 export default class Sun {
   name = "Sun";
-  pointOfView = { x: 0, y: 0, z: 35 };
+  pointOfView = { x: 0, y: 0, z: 55 };
 
   constructor() {
     this.experience = new Experience();
@@ -22,7 +22,7 @@ export default class Sun {
   }
 
   setGeometry() {
-    this.geometry = new THREE.IcosahedronGeometry(10, 62);
+    this.geometry = new THREE.IcosahedronGeometry(20, 62);
   }
 
   setTexture() {

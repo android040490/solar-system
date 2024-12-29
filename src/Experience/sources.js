@@ -32,6 +32,11 @@ export default [
     path: "textures/planets/venus/venus_surface_2k.jpg",
   },
   {
+    name: "jupiter",
+    type: "texture",
+    path: "textures/planets/jupiter/jupiter_2k.jpg",
+  },
+  {
     name: "environmentMap",
     type: "texture",
     path: "textures/environment/stars_milky_way_8k.jpg",

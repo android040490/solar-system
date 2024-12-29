@@ -32,7 +32,7 @@ export default class Earth {
   }
 
   setGeometry() {
-    this.geometry = new THREE.SphereGeometry(2, 64, 64);
+    this.geometry = new THREE.SphereGeometry(1, 64, 64);
   }
 
   setTextures() {

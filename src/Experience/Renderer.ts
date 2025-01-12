@@ -9,14 +9,32 @@ import {
 } from "three/examples/jsm/Addons.js";
 import vertexShader from "../shaders/bloomPass/vertex.glsl";
 import fragmentShader from "../shaders/bloomPass/fragment.glsl";
+import Sizes from "./Utils/Sizes";
+import Camera from "./Camera";
+import Debug from "./Utils/Debug";
+import GUI from "lil-gui";
 
 export const BLOOM_SCENE = 1;
 
 export default class Renderer {
-  materials = {};
-  darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
-  bloomEnabled = true;
-  bloomParams = {
+  private readonly experience: Experience;
+  private readonly canvas: HTMLCanvasElement;
+  private readonly sizes: Sizes;
+  private readonly scene: THREE.Scene;
+  private readonly camera: Camera;
+  private readonly debug: Debug;
+  private readonly bloomLayer: THREE.Layers;
+  private readonly instance: THREE.WebGLRenderer;
+  private bloomPass!: UnrealBloomPass;
+  private bloomComposer!: EffectComposer;
+  private finalComposer!: EffectComposer;
+  private materials: Record<string, THREE.Material> = {};
+  private debugFolder?: GUI;
+  private bloomEnabled = true;
+  private readonly darkMaterial = new THREE.MeshBasicMaterial({
+    color: "black",
+  });
+  private readonly bloomParams = {
     threshold: 1,
     strength: 1,
     radius: 0.5,
@@ -32,6 +50,10 @@ export default class Renderer {
 
     this.bloomLayer = new THREE.Layers();
     this.bloomLayer.set(BLOOM_SCENE);
+    this.instance = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      antialias: true,
+    });
 
     this.darkenNonBloomed = this.darkenNonBloomed.bind(this);
     this.restoreMaterial = this.restoreMaterial.bind(this);
@@ -43,11 +65,29 @@ export default class Renderer {
     }
   }
 
-  init() {
-    this.instance = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      antialias: true,
-    });
+  resize(): void {
+    this.instance.setSize(this.sizes.width, this.sizes.height);
+    this.instance.setPixelRatio(this.sizes.pixelRatio);
+    this.bloomComposer.setSize(this.sizes.width, this.sizes.height);
+    this.finalComposer.setSize(this.sizes.width, this.sizes.height);
+  }
+
+  update(): void {
+    if (this.bloomEnabled) {
+      this.scene.traverse(this.darkenNonBloomed);
+      this.bloomComposer.render();
+      this.scene.traverse(this.restoreMaterial);
+      this.finalComposer.render();
+    } else {
+      this.instance.render(this.scene, this.camera.instance);
+    }
+  }
+
+  dispose(): void {
+    this.instance.dispose();
+  }
+
+  private init(): void {
     // this.instance.toneMapping = THREE.CineonToneMapping;
     // this.instance.toneMappingExposure = 1.75;
     // this.instance.shadowMap.enabled = true;
@@ -59,10 +99,15 @@ export default class Renderer {
     this.setBloomPostProcessing();
   }
 
-  setBloomPostProcessing() {
+  private setBloomPostProcessing(): void {
     const scenePass = new RenderPass(this.scene, this.camera.instance);
 
-    this.bloomPass = new UnrealBloomPass();
+    this.bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(this.sizes.width, this.sizes.height),
+      1.5,
+      0.4,
+      0.85,
+    );
     this.bloomPass.threshold = this.bloomParams.threshold;
     this.bloomPass.strength = this.bloomParams.strength;
     this.bloomPass.radius = this.bloomParams.radius;
@@ -93,62 +138,50 @@ export default class Renderer {
     this.finalComposer.addPass(outputPass);
   }
 
-  resize() {
-    this.instance.setSize(this.sizes.width, this.sizes.height);
-    this.instance.setPixelRatio(this.sizes.pixelRatio);
-    this.bloomComposer.setSize(this.sizes.width, this.sizes.height);
-    this.finalComposer.setSize(this.sizes.width, this.sizes.height);
-  }
-
-  darkenNonBloomed(obj) {
-    if (obj.isMesh && this.bloomLayer.test(obj.layers) === false) {
+  private darkenNonBloomed(obj: THREE.Object3D): void {
+    if (
+      this.bloomLayer.test(obj.layers) === false &&
+      obj instanceof THREE.Mesh &&
+      obj.isMesh
+    ) {
       this.materials[obj.uuid] = obj.material;
       obj.material = this.darkMaterial;
     }
   }
 
-  restoreMaterial(obj) {
-    if (this.materials[obj.uuid]) {
+  private restoreMaterial(obj: THREE.Object3D): void {
+    if (this.materials[obj.uuid] && obj instanceof THREE.Mesh) {
       obj.material = this.materials[obj.uuid];
       delete this.materials[obj.uuid];
     }
   }
 
-  setDebug() {
-    this.debugFolder = this.debug.ui.addFolder("Renderer");
+  private setDebug(): void {
+    this.debugFolder = this.debug.ui?.addFolder("Renderer");
 
-    this.debugFolder.add(this, "bloomEnabled");
+    this.debugFolder?.add(this, "bloomEnabled");
 
-    const bloomFolder = this.debugFolder.addFolder("Bloom");
+    const bloomFolder = this.debugFolder?.addFolder("Bloom");
     bloomFolder
-      .add(this.bloomParams, "threshold", 0.0, 5.0)
-      .onChange((value) => {
+      ?.add(this.bloomParams, "threshold", 0.0, 5.0)
+      .onChange((value: number) => {
         this.bloomPass.threshold = Number(value);
         this.update();
       });
 
-    bloomFolder.add(this.bloomParams, "strength", 0.0, 3).onChange((value) => {
-      this.bloomPass.strength = Number(value);
-      this.update();
-    });
+    bloomFolder
+      ?.add(this.bloomParams, "strength", 0.0, 3)
+      .onChange((value: number) => {
+        this.bloomPass.strength = Number(value);
+        this.update();
+      });
 
     bloomFolder
-      .add(this.bloomParams, "radius", 0.0, 10.0)
+      ?.add(this.bloomParams, "radius", 0.0, 10.0)
       .step(0.01)
-      .onChange((value) => {
+      .onChange((value: number) => {
         this.bloomPass.radius = Number(value);
         this.update();
       });
-  }
-
-  update() {
-    if (this.bloomEnabled) {
-      this.scene.traverse(this.darkenNonBloomed);
-      this.bloomComposer.render();
-      this.scene.traverse(this.restoreMaterial);
-      this.finalComposer.render();
-    } else {
-      this.instance.render(this.scene, this.camera.instance);
-    }
   }
 }

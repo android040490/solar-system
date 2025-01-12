@@ -1,8 +1,17 @@
 import * as THREE from "three";
 import Experience from "./Experience";
 import { OrbitControls } from "three/addons/Addons.js";
+import Sizes from "./Utils/Sizes";
 
 export default class Camera {
+  private readonly experience: Experience;
+  private readonly sizes: Sizes;
+  private readonly scene: THREE.Scene;
+  private readonly canvas: HTMLCanvasElement;
+  private controls!: OrbitControls;
+
+  instance!: THREE.PerspectiveCamera;
+
   constructor() {
     this.experience = new Experience();
 
@@ -14,7 +23,20 @@ export default class Camera {
     this.setControls();
   }
 
-  setInstance() {
+  resize(): void {
+    this.instance.aspect = this.sizes.width / this.sizes.height;
+    this.instance.updateProjectionMatrix();
+  }
+
+  update(): void {
+    this.controls.update();
+  }
+
+  dispose(): void {
+    this.controls.dispose();
+  }
+
+  private setInstance(): void {
     this.instance = new THREE.PerspectiveCamera(
       50,
       this.sizes.width / this.sizes.height,
@@ -26,17 +48,8 @@ export default class Camera {
     this.scene.add(this.instance);
   }
 
-  setControls() {
+  private setControls(): void {
     this.controls = new OrbitControls(this.instance, this.canvas);
     this.controls.enableDamping = true;
-  }
-
-  resize() {
-    this.instance.aspect = this.sizes.width / this.sizes.height;
-    this.instance.updateProjectionMatrix();
-  }
-
-  update() {
-    this.controls.update();
   }
 }

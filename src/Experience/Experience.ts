@@ -10,19 +10,32 @@ import sources from "./sources";
 import Debug from "./Utils/Debug";
 import Navigator from "./World/Navigator";
 
-let instance = null;
+let instance: Experience;
 
 export default class Experience {
-  constructor(canvas) {
+  public readonly canvas!: HTMLCanvasElement;
+  public readonly debug!: Debug;
+  public readonly sizes!: Sizes;
+  public readonly time!: Time;
+  public readonly scene!: THREE.Scene;
+  public readonly resources!: Resources;
+  public readonly camera!: Camera;
+  public readonly renderer!: Renderer;
+  public readonly navigation!: Navigator;
+  public readonly world!: World;
+
+  private stats?: Stats;
+
+  constructor() {
     if (instance) {
       return instance;
     }
 
-    window.experience = this;
+    // window.experience = this;
 
     instance = this;
     // Options
-    this.canvas = canvas;
+    this.canvas = document.querySelector("canvas.webgl") as HTMLCanvasElement;
 
     // Setup
     this.debug = new Debug();
@@ -50,24 +63,7 @@ export default class Experience {
     }
   }
 
-  resize() {
-    this.camera.resize();
-    this.renderer.resize();
-  }
-
-  update() {
-    if (this.debug.active) {
-      this.stats.begin();
-    }
-    this.camera.update();
-    this.world.update();
-    this.renderer.update();
-    if (this.debug.active) {
-      this.stats.end();
-    }
-  }
-
-  destroy() {
+  destroy(): void {
     this.sizes.off("resize");
     this.time.off("tick");
 
@@ -85,15 +81,32 @@ export default class Experience {
       }
     });
 
-    this.camera.controls.dispose();
-    this.renderer.instance.dispose();
+    this.camera.dispose();
+    this.renderer.dispose();
 
     if (this.debug.active) {
-      this.debug.ui.destroy();
+      this.debug.destroy();
     }
   }
 
-  setDebug() {
+  private resize(): void {
+    this.camera.resize();
+    this.renderer.resize();
+  }
+
+  private update(): void {
+    if (this.debug.active) {
+      this.stats?.begin();
+    }
+    this.camera.update();
+    this.world.update();
+    this.renderer.update();
+    if (this.debug.active) {
+      this.stats?.end();
+    }
+  }
+
+  private setDebug(): void {
     this.stats = new Stats();
     this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(this.stats.dom);

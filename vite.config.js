@@ -1,4 +1,5 @@
 import glsl from "vite-plugin-glsl";
+import checker from "vite-plugin-checker";
 
 export default {
   root: "src/",
@@ -13,5 +14,10 @@ export default {
     emptyOutDir: true, // Empty the folder first
     sourcemap: true, // Add sourcemap
   },
-  plugins: [glsl()],
+  plugins: [
+    checker({
+      typescript: true,
+    }),
+    glsl(),
+  ],
 };

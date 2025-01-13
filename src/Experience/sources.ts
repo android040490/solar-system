@@ -1,4 +1,6 @@
-export default [
+import { Source } from "./Utils/Resources";
+
+const sources: Source[] = [
   {
     name: "earthDay",
     type: "texture",
@@ -42,3 +44,5 @@ export default [
     path: "textures/environment/stars_milky_way_8k.jpg",
   },
 ];
+
+export default sources;

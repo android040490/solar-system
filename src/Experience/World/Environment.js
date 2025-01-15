@@ -62,7 +62,7 @@ export default class Environment {
   }
 
   setEnvironmentMap() {
-    this.texture = this.recources.items.environmentMap;
+    this.texture = this.recources.textures.get("environmentMap");
     this.texture.colorSpace = THREE.SRGBColorSpace;
     this.texture.mapping = THREE.EquirectangularReflectionMapping;
     this.scene.background = this.texture;

@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import Experience from "../Experience";
 import Earth from "./Earth";
 import Environment from "./Environment";
@@ -11,18 +10,17 @@ import GUI from "lil-gui";
 import { SpaceObject } from "../../models/space-object";
 
 export default class World {
-  protected experience: Experience;
-  protected scene: THREE.Scene;
-  private resources!: Resources;
+  private experience: Experience;
+  private resources: Resources;
   private debug: Debug;
-  private debugFolder?: GUI;
   private navigation: Navigator;
-  public sun?: Sun;
-  spaceObjects: SpaceObject[] = [];
+  private debugFolder?: GUI;
+  private _sun?: Sun;
+
+  private spaceObjects: SpaceObject[] = [];
 
   constructor() {
     this.experience = new Experience();
-    this.scene = this.experience.scene;
     this.resources = this.experience.resources;
     this.debug = this.experience.debug;
     this.navigation = this.experience.navigation;
@@ -32,12 +30,16 @@ export default class World {
     });
   }
 
-  setup() {
+  get sun(): Sun | undefined {
+    return this._sun;
+  }
+
+  private setup(): void {
     new Environment();
 
-    this.sun = new Sun();
+    this._sun = new Sun();
     this.spaceObjects = [
-      this.sun,
+      this._sun,
       new Planet({
         name: "Mercury",
         radius: 0.38,
@@ -78,7 +80,7 @@ export default class World {
     }
   }
 
-  setDebug() {
+  private setDebug(): void {
     this.debugFolder = this.debug.ui?.addFolder("Navigation");
     this.spaceObjects.forEach((spaceObject) => {
       const obj = {
@@ -90,7 +92,7 @@ export default class World {
     });
   }
 
-  update() {
+  update(): void {
     this.spaceObjects.forEach((spaceObject) => {
       spaceObject.update();
     });

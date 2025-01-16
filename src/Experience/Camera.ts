@@ -8,7 +8,7 @@ export default class Camera {
   private readonly sizes: Sizes;
   private readonly scene: THREE.Scene;
   private readonly canvas: HTMLCanvasElement;
-  private controls!: OrbitControls;
+  private _controls!: OrbitControls;
 
   instance!: THREE.PerspectiveCamera;
 
@@ -23,17 +23,21 @@ export default class Camera {
     this.setControls();
   }
 
+  get controls(): OrbitControls {
+    return this._controls;
+  }
+
   resize(): void {
     this.instance.aspect = this.sizes.width / this.sizes.height;
     this.instance.updateProjectionMatrix();
   }
 
   update(): void {
-    this.controls.update();
+    this._controls.update();
   }
 
   dispose(): void {
-    this.controls.dispose();
+    this._controls.dispose();
   }
 
   private setInstance(): void {
@@ -49,7 +53,7 @@ export default class Camera {
   }
 
   private setControls(): void {
-    this.controls = new OrbitControls(this.instance, this.canvas);
-    this.controls.enableDamping = true;
+    this._controls = new OrbitControls(this.instance, this.canvas);
+    this._controls.enableDamping = true;
   }
 }

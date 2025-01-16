@@ -42,6 +42,7 @@ export default class Environment {
     this.scene.add(this.ambientLight);
   }
 
+  // TODO: maybe move this to the Sun object
   private setDebug(): void {
     this.debugFolder = this.debug.ui?.addFolder("environment");
 

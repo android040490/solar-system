@@ -19,7 +19,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "allowJs": true,
     "types": ["vite-plugin-glsl/ext"]
   },
   "include": ["src"]

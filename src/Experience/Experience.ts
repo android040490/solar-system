@@ -9,6 +9,7 @@ import Resources from "./Utils/Resources";
 import sources from "./sources";
 import Debug from "./Utils/Debug";
 import Navigator from "./World/Navigator";
+import SplashScreen from "./SplashScreen";
 
 let instance: Experience;
 
@@ -23,6 +24,7 @@ export default class Experience {
   public readonly renderer!: Renderer;
   public readonly navigation!: Navigator;
   public readonly world!: World;
+  public readonly splashScreen!: SplashScreen;
 
   private stats?: Stats;
 
@@ -43,6 +45,7 @@ export default class Experience {
     this.time = new Time();
     this.scene = new THREE.Scene();
     this.resources = new Resources(sources);
+    this.splashScreen = new SplashScreen();
     this.camera = new Camera();
     this.renderer = new Renderer();
     this.navigation = new Navigator();

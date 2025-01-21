@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Stats from "stats.js";
-import Sizes from "./Utils/Sizes";
-import Time from "./Utils/Time";
+import Sizes, { SizesEvent } from "./Utils/Sizes";
+import Time, { TimeEvent } from "./Utils/Time";
 import Camera from "./Camera";
 import Renderer from "./Renderer";
 import World from "./World/World";
@@ -10,6 +10,7 @@ import sources from "./sources";
 import Debug from "./Utils/Debug";
 import Navigator from "./World/Navigator";
 import SplashScreen from "./SplashScreen";
+import eventsManager, { EventsManager } from "./Utils/EventsManager";
 
 let instance: Experience;
 
@@ -25,6 +26,7 @@ export default class Experience {
   public readonly navigation!: Navigator;
   public readonly world!: World;
   public readonly splashScreen!: SplashScreen;
+  private readonly eventsManager: EventsManager = eventsManager;
 
   private stats?: Stats;
 
@@ -52,12 +54,12 @@ export default class Experience {
     this.world = new World();
 
     // Sizes resize event
-    this.sizes.on("resize", () => {
+    this.eventsManager.on(SizesEvent.Resize, () => {
       this.resize();
     });
 
     // Time tick event
-    this.time.on("tick", () => {
+    this.eventsManager.on(TimeEvent.Tick, () => {
       this.update();
     });
 
@@ -67,8 +69,8 @@ export default class Experience {
   }
 
   destroy(): void {
-    this.sizes.off("resize");
-    this.time.off("tick");
+    this.eventsManager.off(SizesEvent.Resize);
+    this.eventsManager.off(TimeEvent.Tick);
 
     this.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {

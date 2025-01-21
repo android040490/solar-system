@@ -1,14 +1,12 @@
-import Experience from "./Experience";
-import Resources from "./Utils/Resources";
+import eventsManager, { EventsManager } from "./Utils/EventsManager";
+import { ResourcesEvent } from "./Utils/Resources";
 
 export default class SplashScreen {
-  private resources: Resources;
   private loadingBar: HTMLElement | null;
   private splashScreen: HTMLElement | null;
+  private readonly eventsManager: EventsManager = eventsManager;
 
   constructor() {
-    const experience = new Experience();
-    this.resources = experience.resources;
     this.loadingBar = document.getElementById("loading-bar");
     this.splashScreen = document.getElementById("splash-screen");
 
@@ -16,11 +14,11 @@ export default class SplashScreen {
   }
 
   private setListeners(): void {
-    this.resources.on("progress", (progress) => {
+    this.eventsManager.on(ResourcesEvent.LoadingProgress, (progress) => {
       this.updateProgressBar(progress);
     });
 
-    this.resources.on("ready", () => {
+    this.eventsManager.on(ResourcesEvent.Ready, () => {
       this.hide();
     });
   }

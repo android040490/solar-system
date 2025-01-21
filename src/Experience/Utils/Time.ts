@@ -1,14 +1,17 @@
-import EventEmitter from "eventemitter3";
+import eventsManager, { EventsManager } from "./EventsManager";
 
-export default class Time extends EventEmitter {
+export enum TimeEvent {
+  Tick = "time:tick",
+}
+
+export default class Time {
   private start: number;
   private current: number;
   private _elapsed: number;
   private _delta: number;
+  private readonly eventsManager: EventsManager = eventsManager;
 
   constructor() {
-    super();
-
     // Setup
     this.start = Date.now();
     this.current = this.start;
@@ -34,7 +37,7 @@ export default class Time extends EventEmitter {
     this.current = currentTime;
     this._elapsed = this.current - this.start;
 
-    this.emit("tick");
+    this.eventsManager.emit(TimeEvent.Tick);
 
     window.requestAnimationFrame(() => {
       this.tick();

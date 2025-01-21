@@ -1,9 +1,13 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import EventEmitter from "eventemitter3";
-// import gsap from "gsap";
+import eventsManager, { EventsManager } from "./EventsManager";
 
 type SourceType = "texture" | "gltfModel";
+
+export enum ResourcesEvent {
+  Ready = "resources:ready",
+  LoadingProgress = "resources:loading-progress",
+}
 
 export interface Source {
   name: string;
@@ -16,14 +20,13 @@ interface Loaders {
   gltfModel: GLTFLoader;
 }
 
-export default class Resources extends EventEmitter {
+export default class Resources {
   private readonly loadingManager: THREE.LoadingManager;
   private readonly loaders: Loaders;
   private _textures: Map<string, THREE.Texture> = new Map();
+  private readonly eventsManager: EventsManager = eventsManager;
 
   constructor(sources: Source[]) {
-    super();
-
     this.loadingManager = new THREE.LoadingManager();
     this.loaders = {
       texture: new THREE.TextureLoader(this.loadingManager),
@@ -54,11 +57,11 @@ export default class Resources extends EventEmitter {
 
   private listenLoadingEvents(): void {
     this.loadingManager.onLoad = () => {
-      this.emit("ready");
+      this.eventsManager.emit(ResourcesEvent.Ready);
     };
     this.loadingManager.onProgress = (_: string, loaded, total) => {
       const progress = loaded / total;
-      this.emit("progress", progress);
+      this.eventsManager.emit(ResourcesEvent.LoadingProgress, progress);
     };
   }
 }

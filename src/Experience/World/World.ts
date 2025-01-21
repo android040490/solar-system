@@ -3,29 +3,29 @@ import Earth from "./Earth";
 import Environment from "./Environment";
 import Planet from "./Planet";
 import Sun from "./Sun";
-import Resources from "../Utils/Resources";
 import Debug from "../Utils/Debug";
 import Navigator from "./Navigator";
 import GUI from "lil-gui";
 import { SpaceObject } from "../../models/space-object";
+import eventsManager, { EventsManager } from "../Utils/EventsManager";
+import { ResourcesEvent } from "../Utils/Resources";
 
 export default class World {
   private experience: Experience;
-  private resources: Resources;
   private debug: Debug;
   private navigation: Navigator;
   private debugFolder?: GUI;
   private _sun?: Sun;
 
+  private readonly eventsManager: EventsManager = eventsManager;
   private spaceObjects: SpaceObject[] = [];
 
   constructor() {
     this.experience = new Experience();
-    this.resources = this.experience.resources;
     this.debug = this.experience.debug;
     this.navigation = this.experience.navigation;
 
-    this.resources.on("ready", () => {
+    this.eventsManager.on(ResourcesEvent.Ready, () => {
       this.setup();
     });
   }

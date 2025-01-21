@@ -1,12 +1,16 @@
-import EventEmitter from "eventemitter3";
+import eventsManager, { EventsManager } from "./EventsManager";
 
-export default class Sizes extends EventEmitter {
+export enum SizesEvent {
+  Resize = "sizes:resize",
+}
+
+export default class Sizes {
   private _width: number;
   private _height: number;
   private _pixelRatio: number;
+  private readonly eventsManager: EventsManager = eventsManager;
 
   constructor() {
-    super();
     // Setup
     this._width = window.innerWidth;
     this._height = window.innerHeight;
@@ -18,7 +22,7 @@ export default class Sizes extends EventEmitter {
       this._height = window.innerHeight;
       this._pixelRatio = Math.min(window.devicePixelRatio, 2);
 
-      this.emit("resize");
+      this.eventsManager.emit(SizesEvent.Resize);
     });
   }
 

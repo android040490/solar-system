@@ -26,11 +26,11 @@ export default class SplashScreen {
   private hide(): void {
     this.splashScreen?.classList.add("hidden");
 
-    this.splashScreen?.addEventListener("transitionend", () => {
+    setTimeout(() => {
       if (this.splashScreen) {
         this.splashScreen.style.display = "none";
       }
-    });
+    }, 3000);
 
     setTimeout(() => {
       if (this.loadingBar) {

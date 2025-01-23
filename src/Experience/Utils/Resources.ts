@@ -2,17 +2,9 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import eventsManager, { EventsManager } from "./EventsManager";
 
-type SourceType = "texture" | "gltfModel";
-
 export enum ResourcesEvent {
   Ready = "resources:ready",
   LoadingProgress = "resources:loading-progress",
-}
-
-export interface Source {
-  name: string;
-  type: SourceType;
-  path: string;
 }
 
 interface Loaders {
@@ -23,10 +15,9 @@ interface Loaders {
 export default class Resources {
   private readonly loadingManager: THREE.LoadingManager;
   private readonly loaders: Loaders;
-  private _textures: Map<string, THREE.Texture> = new Map();
   private readonly eventsManager: EventsManager = eventsManager;
 
-  constructor(sources: Source[]) {
+  constructor() {
     this.loadingManager = new THREE.LoadingManager();
     this.loaders = {
       texture: new THREE.TextureLoader(this.loadingManager),
@@ -34,25 +25,27 @@ export default class Resources {
     };
 
     this.listenLoadingEvents();
-    this.startLoading(sources);
   }
 
-  get textures(): Map<string, THREE.Texture> {
-    return this._textures;
+  loadTexture(path: string): Promise<THREE.Texture | undefined> {
+    return new Promise((resolve) => {
+      // TODO: consider caching if necessary
+      this.loaders.texture.load(
+        path,
+        (file) => {
+          resolve(file);
+        },
+        (_: ProgressEvent) => {},
+        (error: any) => {
+          console.error("Load texture error:", error);
+          resolve(undefined);
+        },
+      );
+    });
   }
 
-  private startLoading(sources: Source[]): void {
-    for (const source of sources) {
-      this.loaders[source.type].load(source.path, (file) => {
-        if (file instanceof THREE.Texture) {
-          this.textureLoaded(source, file);
-        }
-      });
-    }
-  }
-
-  private textureLoaded(source: Source, file: THREE.Texture): void {
-    this._textures.set(source.name, file);
+  loadTextures(paths: string[]): Promise<Array<THREE.Texture | undefined>> {
+    return Promise.all(paths.map((path) => this.loadTexture(path)));
   }
 
   private listenLoadingEvents(): void {

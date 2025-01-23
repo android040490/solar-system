@@ -8,5 +8,5 @@ export interface PointOfView {
 
 export interface ViewableObject {
   pointOfView: PointOfView;
-  mesh: THREE.Mesh;
+  position: THREE.Vector3;
 }

@@ -13,12 +13,14 @@ export default class Sun implements SpaceObject {
   private readonly scene: THREE.Scene;
   private readonly resources: Resources;
 
-  private radius = 20;
-  private geometry!: THREE.BufferGeometry;
-  private material!: THREE.ShaderMaterial;
-  private _mesh!: THREE.Mesh;
   private lavaTexture?: THREE.Texture;
   private cloudTexture?: THREE.Texture;
+  private geometry?: THREE.BufferGeometry;
+  private material?: THREE.ShaderMaterial;
+  private mesh?: THREE.Mesh;
+
+  private _position = new THREE.Vector3(0, 0, 0);
+  private radius = 20;
 
   public readonly name = "Sun";
   public readonly pointOfView = { x: 0, y: 0, z: 55 };
@@ -29,15 +31,17 @@ export default class Sun implements SpaceObject {
     this.time = this.experience.time;
     this.resources = this.experience.resources;
 
-    this.init();
+    this.loadTextures().then(() => this.init());
   }
 
   update(): void {
-    this.material.uniforms.time.value += 0.0005 * this.time.delta;
+    if (this.material) {
+      this.material.uniforms.time.value += 0.0005 * this.time.delta;
+    }
   }
 
-  get mesh(): THREE.Mesh {
-    return this._mesh;
+  get position(): THREE.Vector3 {
+    return this._position;
   }
 
   private init(): void {
@@ -51,9 +55,17 @@ export default class Sun implements SpaceObject {
     this.geometry = new THREE.IcosahedronGeometry(this.radius, 62);
   }
 
+  private async loadTextures(): Promise<void> {
+    const [lavaTexture, cloudTexture] = await this.resources.loadTextures([
+      "textures/sun/lavatile.jpg",
+      "textures/sun/cloud.png",
+    ]);
+
+    this.lavaTexture = lavaTexture;
+    this.cloudTexture = cloudTexture;
+  }
+
   private setTexture(): void {
-    this.lavaTexture = this.resources.textures.get("sunLava");
-    this.cloudTexture = this.resources.textures.get("sunCloud");
     if (this.lavaTexture) {
       this.lavaTexture.colorSpace = THREE.SRGBColorSpace;
       this.lavaTexture.wrapS = THREE.RepeatWrapping;
@@ -84,8 +96,8 @@ export default class Sun implements SpaceObject {
   }
 
   private setMesh(): void {
-    this._mesh = new THREE.Mesh(this.geometry, this.material);
-    this.scene.add(this._mesh);
-    this._mesh.layers.enable(BLOOM_SCENE);
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.scene.add(this.mesh);
+    this.mesh.layers.enable(BLOOM_SCENE);
   }
 }

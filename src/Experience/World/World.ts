@@ -7,17 +7,15 @@ import Debug from "../Utils/Debug";
 import Navigator from "./Navigator";
 import GUI from "lil-gui";
 import { SpaceObject } from "../../models/space-object";
-import eventsManager, { EventsManager } from "../Utils/EventsManager";
-import { ResourcesEvent } from "../Utils/Resources";
 
 export default class World {
-  private experience: Experience;
-  private debug: Debug;
-  private navigation: Navigator;
+  private readonly experience: Experience;
+  private readonly debug: Debug;
+  private readonly navigation: Navigator;
+
   private debugFolder?: GUI;
   private _sun?: Sun;
 
-  private readonly eventsManager: EventsManager = eventsManager;
   private spaceObjects: SpaceObject[] = [];
 
   constructor() {
@@ -25,9 +23,7 @@ export default class World {
     this.debug = this.experience.debug;
     this.navigation = this.experience.navigation;
 
-    this.eventsManager.on(ResourcesEvent.Ready, () => {
-      this.setup();
-    });
+    this.setup();
   }
 
   get sun(): Sun | undefined {
@@ -43,33 +39,33 @@ export default class World {
       new Planet({
         name: "Mercury",
         radius: 0.38,
-        textureKey: "mercury",
+        textureFilePath: "textures/planets/mercury/mercury_2k.jpg",
         distanceToSun: 35,
         pointOfView: { x: 0, y: 0, z: 3 },
       }),
       new Planet({
         name: "Venus",
         radius: 0.94,
-        textureKey: "venusSurface",
+        textureFilePath: "textures/planets/venus/venus_surface_2k.jpg",
         distanceToSun: 45,
         pointOfView: { x: 0, y: 0, z: 5 },
       }),
       new Earth({
         radius: 1,
-        distanceToSun: 55,
+        distanceToSun: 505,
         pointOfView: { x: 0, y: 0, z: 5 },
       }),
       new Planet({
         name: "Mars",
         radius: 0.53,
-        textureKey: "mars",
+        textureFilePath: "textures/planets/mars/mars_2k.jpg",
         distanceToSun: 65,
         pointOfView: { x: 0, y: 0, z: 5 },
       }),
       new Planet({
         name: "Jupiter",
         radius: 10.96,
-        textureKey: "jupiter",
+        textureFilePath: "textures/planets/jupiter/jupiter_2k.jpg",
         distanceToSun: 90,
         pointOfView: { x: 0, y: 0, z: 30 },
       }),

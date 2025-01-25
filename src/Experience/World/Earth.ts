@@ -21,59 +21,79 @@ export default class Earth implements SpaceObject {
   private readonly experience: Experience;
   private readonly scene: THREE.Scene;
   private readonly time: Time;
-  private readonly radius: number;
-  private readonly distanceToSun: number;
   private readonly debug: Debug;
+  private readonly resources: Resources;
+  private readonly radius: number;
+  private readonly spherical: THREE.Spherical;
+
+  private group?: THREE.Group;
+  private geometry?: THREE.BufferGeometry;
+  private earthDayTexture?: THREE.Texture;
+  private earthNightTexture?: THREE.Texture;
+  private earthSpecularCloudsTexture?: THREE.Texture;
+  private surfaceMaterial?: THREE.ShaderMaterial;
+  private atmosphereMaterial?: THREE.ShaderMaterial;
+  private surfaceMesh?: THREE.Mesh;
+  private atmosphereMesh?: THREE.Mesh;
+  private sunPosition?: THREE.Vector3;
+  private debugFolder?: GUI;
 
   private atmosphereTwilightColor = "#ff6600";
   private atmosphereDayColor = "#00aaff";
   private cloudsIntencity = 0.5;
-  private geometry!: THREE.BufferGeometry;
-  private resources!: Resources;
-  private surfaceMaterial!: THREE.ShaderMaterial;
-  private atmosphereMaterial!: THREE.ShaderMaterial;
-  private atmosphereMesh!: THREE.Mesh;
-  private spherical!: THREE.Spherical;
-  private _mesh!: THREE.Mesh;
-  private sunPosition?: THREE.Vector3;
-  private earthDayTexture?: THREE.Texture;
-  private earthNightTexture?: THREE.Texture;
-  private earthSpecularCloudsTexture?: THREE.Texture;
-  private debugFolder?: GUI;
 
   public readonly name = "Earth";
   public readonly pointOfView: PointOfView;
 
   constructor(options: EarthOptions) {
-    const { radius, distanceToSun, pointOfView } = options;
-    this.radius = radius;
-    this.distanceToSun = distanceToSun;
-    this.pointOfView = pointOfView;
-
     this.experience = new Experience();
     this.scene = this.experience.scene;
     this.time = this.experience.time;
     this.resources = this.experience.resources;
     this.debug = this.experience.debug;
-    this.sunPosition = this.experience.world.sun?.mesh?.position;
 
-    this.init();
+    const { radius, distanceToSun, pointOfView } = options;
+    this.radius = radius;
+    this.pointOfView = pointOfView;
+    this.sunPosition =
+      this.experience.world?.sun?.position ?? new THREE.Vector3(0, 0, 0); // TODO: maybe change this to not be hardcoded
+    this.spherical = new THREE.Spherical(
+      distanceToSun,
+      Math.PI * 0.5,
+      Math.PI * 0.5,
+    );
+
+    this.loadTextures().then(() => this.init());
   }
 
-  get mesh(): THREE.Mesh {
-    return this._mesh;
+  get position(): THREE.Vector3 {
+    return new THREE.Vector3().setFromSpherical(this.spherical);
   }
 
   update(): void {
-    this._mesh.rotation.y = this.time.elapsed * 0.0001;
+    if (this.group) {
+      this.group.rotation.y = this.time.elapsed * 0.0001;
+    }
+  }
+
+  private async loadTextures(): Promise<void> {
+    const [earthDayTexture, earthNightTexture, earthSpecularCloudsTexture] =
+      await this.resources.loadTextures([
+        "textures/planets/earth/day.jpg",
+        "textures/planets/earth/night.jpg",
+        "textures/planets/earth/specularClouds.jpg",
+      ]);
+
+    this.earthDayTexture = earthDayTexture;
+    this.earthNightTexture = earthNightTexture;
+    this.earthSpecularCloudsTexture = earthSpecularCloudsTexture;
   }
 
   private init(): void {
     this.setGeometry();
-    this.configureTexture();
+    this.setTexture();
     this.setMaterial();
     this.setMesh();
-    this.setAtmosphere();
     if (this.debug.active) {
       this.setDebug();
     }
@@ -83,12 +103,7 @@ export default class Earth implements SpaceObject {
     this.geometry = new THREE.SphereGeometry(this.radius, 64, 64);
   }
 
-  private configureTexture(): void {
-    this.earthDayTexture = this.resources.textures.get("earthDay");
-    this.earthNightTexture = this.resources.textures.get("earthNight");
-    this.earthSpecularCloudsTexture = this.resources.textures.get(
-      "earthSpecularClouds",
-    );
+  private setTexture(): void {
     if (this.earthDayTexture) {
       this.earthDayTexture.colorSpace = THREE.SRGBColorSpace;
       this.earthDayTexture.anisotropy = 8;
@@ -141,42 +156,35 @@ export default class Earth implements SpaceObject {
   }
 
   private setMesh(): void {
-    this.spherical = new THREE.Spherical(
-      this.distanceToSun,
-      Math.PI * 0.5,
-      Math.PI * 0.5,
-    );
-    this._mesh = new THREE.Mesh(this.geometry, this.surfaceMaterial);
-    this._mesh.position.setFromSpherical(this.spherical);
+    this.group = new THREE.Group();
+    this.surfaceMesh = new THREE.Mesh(this.geometry, this.surfaceMaterial);
 
-    this.scene.add(this._mesh);
-  }
-
-  private setAtmosphere(): void {
     this.atmosphereMesh = new THREE.Mesh(
       this.geometry,
       this.atmosphereMaterial,
     );
     this.atmosphereMesh.scale.set(1.04, 1.04, 1.04);
-    this.atmosphereMesh.position.setFromSpherical(this.spherical);
-    this.scene.add(this.atmosphereMesh);
+
+    this.group.position.setFromSpherical(this.spherical);
+    this.group.add(this.surfaceMesh, this.atmosphereMesh);
+    this.scene.add(this.group);
   }
 
   private setDebug(): void {
     this.debugFolder = this.debug.ui?.addFolder("Earth");
     this.debugFolder?.addColor(this, "atmosphereDayColor").onChange(() => {
-      this.surfaceMaterial.uniforms.uAtmosphereDayColor.value.set(
+      this.surfaceMaterial?.uniforms.uAtmosphereDayColor.value.set(
         this.atmosphereDayColor,
       );
-      this.atmosphereMaterial.uniforms.uAtmosphereDayColor.value.set(
+      this.atmosphereMaterial?.uniforms.uAtmosphereDayColor.value.set(
         this.atmosphereDayColor,
       );
     });
     this.debugFolder?.addColor(this, "atmosphereTwilightColor").onChange(() => {
-      this.surfaceMaterial.uniforms.uAtmosphereTwilightColor.value.set(
+      this.surfaceMaterial?.uniforms.uAtmosphereTwilightColor.value.set(
         this.atmosphereTwilightColor,
       );
-      this.atmosphereMaterial.uniforms.uAtmosphereTwilightColor.value.set(
+      this.atmosphereMaterial?.uniforms.uAtmosphereTwilightColor.value.set(
         this.atmosphereTwilightColor,
       );
     });
@@ -186,8 +194,10 @@ export default class Earth implements SpaceObject {
       .max(1)
       .step(0.01)
       .onChange(() => {
-        this.surfaceMaterial.uniforms.uCloudsIntencity.value =
-          this.cloudsIntencity;
+        if (this.surfaceMaterial) {
+          this.surfaceMaterial.uniforms.uCloudsIntencity.value =
+            this.cloudsIntencity;
+        }
       });
     this.debugFolder
       ?.add(this.spherical, "phi")
@@ -204,7 +214,8 @@ export default class Earth implements SpaceObject {
   }
 
   private updatePosition(): void {
-    this._mesh.position.setFromSpherical(this.spherical);
-    this.atmosphereMesh.position.setFromSpherical(this.spherical);
+    if (this.group) {
+      this.group.position.setFromSpherical(this.spherical);
+    }
   }
 }

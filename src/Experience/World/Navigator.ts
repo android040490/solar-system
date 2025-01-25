@@ -5,9 +5,9 @@ import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { ViewableObject } from "../../models/navigation";
 
 export default class Navigator {
-  private experience: Experience;
-  private camera: THREE.PerspectiveCamera;
-  private controls: OrbitControls;
+  private readonly experience: Experience;
+  private readonly camera: THREE.PerspectiveCamera;
+  private readonly controls: OrbitControls;
   private currentCameraDirection: THREE.Vector3;
 
   constructor() {
@@ -21,9 +21,9 @@ export default class Navigator {
   }
 
   navigateTo(spaceObject: ViewableObject): void {
-    const { mesh, pointOfView } = spaceObject;
+    const { position, pointOfView } = spaceObject;
     const tl = gsap.timeline();
-    const newCameraDirection = mesh.position.clone();
+    const newCameraDirection = position.clone();
     const newCameraPosition = newCameraDirection
       .clone()
       .add(new THREE.Vector3(pointOfView.x, pointOfView.y, pointOfView.z));

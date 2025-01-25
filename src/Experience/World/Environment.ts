@@ -5,10 +5,11 @@ import Debug from "../Utils/Debug";
 import Resources from "../Utils/Resources";
 
 export default class Environment {
-  private experience: Experience;
-  private scene: THREE.Scene;
-  private debug: Debug;
-  private resources: Resources;
+  private readonly experience: Experience;
+  private readonly scene: THREE.Scene;
+  private readonly debug: Debug;
+  private readonly resources: Resources;
+
   private sunLight!: THREE.PointLight;
   private ambientLight!: THREE.AmbientLight;
   private debugFolder?: GUI;
@@ -20,7 +21,19 @@ export default class Environment {
     this.resources = this.experience.resources;
     this.debug = this.experience.debug;
 
-    this.setSunLight();
+    this.setLight();
+    this.loadTexture().then(() => {
+      this.init();
+    });
+  }
+
+  private async loadTexture(): Promise<void> {
+    this.texture = await this.resources.loadTexture(
+      "textures/environment/stars_milky_way_8k.jpg",
+    );
+  }
+
+  private init(): void {
     this.setEnvironmentMap();
 
     if (this.debug.active) {
@@ -28,7 +41,7 @@ export default class Environment {
     }
   }
 
-  private setSunLight(): void {
+  private setLight(): void {
     // point light
     this.sunLight = new THREE.PointLight("#ffffff", 5, 1000, 0);
     this.sunLight.castShadow = true;
@@ -73,7 +86,6 @@ export default class Environment {
   }
 
   private setEnvironmentMap(): void {
-    this.texture = this.resources.textures.get("environmentMap");
     if (this.texture) {
       this.texture.colorSpace = THREE.SRGBColorSpace;
       this.texture.mapping = THREE.EquirectangularReflectionMapping;

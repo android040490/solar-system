@@ -6,7 +6,6 @@ import Camera from "./Camera";
 import Renderer from "./Renderer";
 import World from "./World/World";
 import Resources from "./Utils/Resources";
-import sources from "./sources";
 import Debug from "./Utils/Debug";
 import Navigator from "./World/Navigator";
 import SplashScreen from "./SplashScreen";
@@ -46,7 +45,7 @@ export default class Experience {
     this.sizes = new Sizes();
     this.time = new Time();
     this.scene = new THREE.Scene();
-    this.resources = new Resources(sources);
+    this.resources = new Resources();
     this.splashScreen = new SplashScreen();
     this.camera = new Camera();
     this.renderer = new Renderer();

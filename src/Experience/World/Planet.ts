@@ -3,66 +3,80 @@ import Experience from "../Experience";
 import Time from "../Utils/Time";
 import { PointOfView } from "../../models/navigation";
 import { SpaceObject } from "../../models/space-object";
+import Resources from "../Utils/Resources";
 
 interface PlanetOptions {
   name: string;
   radius: number;
   distanceToSun: number;
   pointOfView: PointOfView;
-  textureKey: string;
+  textureFilePath: string;
 }
 
 export default class Planet implements SpaceObject {
   private readonly experience: Experience;
-  private readonly time: Time;
   private readonly scene: THREE.Scene;
+  private readonly resources: Resources;
+  private readonly time: Time;
   private readonly radius: number;
-  private readonly distanceToSun: number;
+  private readonly spherical: THREE.Spherical;
 
-  private _mesh!: THREE.Mesh;
-  private geometry!: THREE.BufferGeometry;
-  private spherical!: THREE.Spherical;
-  private material!: THREE.Material;
   private texture?: THREE.Texture;
+  private material?: THREE.Material;
+  private geometry?: THREE.BufferGeometry;
+  private mesh?: THREE.Mesh;
 
-  public readonly pointOfView: PointOfView;
   public readonly name: string;
+  public readonly pointOfView: PointOfView;
 
   constructor(options: PlanetOptions) {
-    const { name, radius, textureKey, distanceToSun, pointOfView } = options;
-    this.name = name;
-    this.radius = radius;
-    this.distanceToSun = distanceToSun;
-    this.pointOfView = pointOfView;
-
     this.experience = new Experience();
     this.scene = this.experience.scene;
+    this.resources = this.experience.resources;
     this.time = this.experience.time;
-    this.texture = this.experience.resources.textures.get(textureKey);
 
-    this.init();
+    const { name, radius, textureFilePath, distanceToSun, pointOfView } =
+      options;
+    this.name = name;
+    this.radius = radius;
+    this.pointOfView = pointOfView;
+    this.spherical = new THREE.Spherical(
+      distanceToSun,
+      Math.PI * 0.5,
+      Math.PI * 0.5,
+    );
+
+    this.loadTexture(textureFilePath).then(() => {
+      this.init();
+    });
   }
 
-  get mesh(): THREE.Mesh {
-    return this._mesh;
+  get position(): THREE.Vector3 {
+    return new THREE.Vector3().setFromSpherical(this.spherical);
   }
 
   update(): void {
-    this.mesh.rotation.y = this.time.elapsed * 0.0001;
+    if (this.mesh) {
+      this.mesh.rotation.y = this.time.elapsed * 0.0001;
+    }
+  }
+
+  private async loadTexture(path: string): Promise<void> {
+    this.texture = await this.resources.loadTexture(path);
+  }
+
+  private init(): void {
+    this.setGeometry();
+    this.setTexture();
+    this.setMaterial();
+    this.setMesh();
   }
 
   private setGeometry(): void {
     this.geometry = new THREE.SphereGeometry(this.radius, 64, 64);
   }
 
-  private init(): void {
-    this.setGeometry();
-    this.configureTexture();
-    this.setMaterial();
-    this.setMesh();
-  }
-
-  private configureTexture(): void {
+  private setTexture(): void {
     if (this.texture) {
       this.texture.colorSpace = THREE.SRGBColorSpace;
       this.texture.anisotropy = 8;
@@ -76,13 +90,8 @@ export default class Planet implements SpaceObject {
   }
 
   private setMesh(): void {
-    this.spherical = new THREE.Spherical(
-      this.distanceToSun,
-      Math.PI * 0.5,
-      Math.PI * 0.5,
-    );
-    this._mesh = new THREE.Mesh(this.geometry, this.material);
-    this._mesh.position.setFromSpherical(this.spherical);
-    this.scene.add(this._mesh);
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.mesh.position.setFromSpherical(this.spherical);
+    this.scene.add(this.mesh);
   }
 }

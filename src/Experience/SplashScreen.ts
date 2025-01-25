@@ -46,7 +46,7 @@ export default class SplashScreen {
     }
     const progressTextElement = document.getElementById("progress-text");
     if (progressTextElement) {
-      progressTextElement.innerText = `Loading ${progress * 100}%`;
+      progressTextElement.innerText = `Loading ${Math.floor(progress * 100)}%`;
     }
   }
 }

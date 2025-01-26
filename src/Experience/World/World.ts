@@ -1,28 +1,14 @@
-import Experience from "../Experience";
 import Earth from "./Earth";
 import Environment from "./Environment";
 import Planet from "./Planet";
 import Sun from "./Sun";
-import Debug from "../Utils/Debug";
-import Navigator from "./Navigator";
-import GUI from "lil-gui";
 import SpaceObject from "../../models/space-object";
 
 export default class World {
-  private readonly experience: Experience;
-  private readonly debug: Debug;
-  private readonly navigation: Navigator;
-
-  private debugFolder?: GUI;
   private _sun?: Sun;
-
-  private spaceObjects: SpaceObject[] = [];
+  private _spaceObjects: SpaceObject[] = [];
 
   constructor() {
-    this.experience = new Experience();
-    this.debug = this.experience.debug;
-    this.navigation = this.experience.navigation;
-
     this.setup();
   }
 
@@ -30,11 +16,15 @@ export default class World {
     return this._sun;
   }
 
+  get spaceObjects(): SpaceObject[] {
+    return this._spaceObjects;
+  }
+
   private setup(): void {
     new Environment();
 
     this._sun = new Sun();
-    this.spaceObjects = [
+    this._spaceObjects = [
       this._sun,
       new Planet({
         name: "Mercury",
@@ -76,26 +66,10 @@ export default class World {
         offsetAngle: Math.random() * Math.PI * 2,
       }),
     ];
-
-    if (this.debug.active) {
-      this.setDebug();
-    }
-  }
-
-  private setDebug(): void {
-    this.debugFolder = this.debug.ui?.addFolder("Navigation");
-    this.spaceObjects.forEach((spaceObject) => {
-      const obj = {
-        navigateTo: () => {
-          this.navigation.navigateTo(spaceObject);
-        },
-      };
-      this.debugFolder?.add(obj, "navigateTo").name(spaceObject.name);
-    });
   }
 
   update(): void {
-    this.spaceObjects.forEach((spaceObject) => {
+    this._spaceObjects.forEach((spaceObject) => {
       spaceObject.update();
     });
   }

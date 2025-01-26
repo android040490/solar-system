@@ -49,8 +49,8 @@ export default class Experience {
     this.splashScreen = new SplashScreen();
     this.camera = new Camera();
     this.renderer = new Renderer();
-    this.navigation = new Navigator();
     this.world = new World();
+    this.navigation = new Navigator();
 
     // Sizes resize event
     this.eventsManager.on(SizesEvent.Resize, () => {

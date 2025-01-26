@@ -40,7 +40,9 @@ void main(void)
         temp.rg += temp.b - 1.0;
     }
 
-    gl_FragColor = temp * 10.0;
+    temp = temp * 10.0;
+    // gl_FragColor = temp;
+    gl_FragColor = vec4(temp.r, temp.r * 0.2, temp.b, 1.0);
 
     // float depth = gl_FragCoord.z / gl_FragCoord.w;
     // const float LOG2 = 1.442695;

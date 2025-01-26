@@ -20,4 +20,9 @@ export default {
     }),
     glsl(),
   ],
+  css: {
+    modules: {
+      localsConvention: "camelCase",
+    },
+  },
 };

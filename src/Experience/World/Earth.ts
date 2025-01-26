@@ -3,29 +3,15 @@ import earthVertexShader from "../../shaders/earth/vertex.glsl";
 import earthFragmentShader from "../../shaders/earth/fragment.glsl";
 import atmosphereVertexShader from "../../shaders/atmosphere/vertex.glsl";
 import atmosphereFragmentShader from "../../shaders/atmosphere/fragment.glsl";
-import Resources from "../Utils/Resources";
-import Debug from "../Utils/Debug";
 import GUI from "lil-gui";
-import { PointOfView } from "../../models/navigation";
-import Experience from "../Experience";
-import Time from "../Utils/Time";
-import { SpaceObject } from "../../models/space-object";
+import OrbitalObject from "../../models/orbital-object";
+import SpaceObject from "../../models/space-object";
 
 interface EarthOptions {
-  radius: number;
-  distanceToSun: number;
-  pointOfView: PointOfView;
+  parentObject: SpaceObject;
 }
 
-export default class Earth implements SpaceObject {
-  private readonly experience: Experience;
-  private readonly scene: THREE.Scene;
-  private readonly time: Time;
-  private readonly debug: Debug;
-  private readonly resources: Resources;
-  private readonly radius: number;
-  private readonly spherical: THREE.Spherical;
-
+export default class Earth extends OrbitalObject {
   private group?: THREE.Group;
   private geometry?: THREE.BufferGeometry;
   private earthDayTexture?: THREE.Texture;
@@ -42,45 +28,35 @@ export default class Earth implements SpaceObject {
   private atmosphereDayColor = "#00aaff";
   private cloudsIntencity = 0.5;
 
-  public readonly name = "Earth";
-  public readonly pointOfView: PointOfView;
-
   constructor(options: EarthOptions) {
-    this.experience = new Experience();
-    this.scene = this.experience.scene;
-    this.time = this.experience.time;
-    this.resources = this.experience.resources;
-    this.debug = this.experience.debug;
+    super({
+      ...options,
+      name: "Earth",
+      radius: 1,
+      orbitRadius: 500,
+      orbitSpeed: Math.random() * 0.1, // TODO: change this to not be hardcoded
+      offsetAngle: Math.random() * Math.PI * 2, // TODO: change this to not be hardcoded
+    });
 
-    const { radius, distanceToSun, pointOfView } = options;
-    this.radius = radius;
-    this.pointOfView = pointOfView;
     this.sunPosition =
       this.experience.world?.sun?.position ?? new THREE.Vector3(0, 0, 0); // TODO: maybe change this to not be hardcoded
-    this.spherical = new THREE.Spherical(
-      distanceToSun,
-      Math.PI * 0.5,
-      Math.PI * 0.5,
-    );
 
     this.loadTextures().then(() => this.init());
   }
 
-  get position(): THREE.Vector3 {
-    return new THREE.Vector3().setFromSpherical(this.spherical);
-  }
-
   update(): void {
+    super.update();
     if (this.group) {
       this.group.rotation.y = this.time.elapsed * 0.0001;
+      this.group.position.copy(this.position);
     }
   }
 
   private async loadTextures(): Promise<void> {
     const [earthDayTexture, earthNightTexture, earthSpecularCloudsTexture] =
       await this.resources.loadTextures([
-        "textures/planets/earth/day.jpg",
-        "textures/planets/earth/night.jpg",
+        "textures/planets/earth/day_8k.jpg",
+        "textures/planets/earth/night_8k.jpg",
         "textures/planets/earth/specularClouds.jpg",
       ]);
 
@@ -89,21 +65,11 @@ export default class Earth implements SpaceObject {
     this.earthSpecularCloudsTexture = earthSpecularCloudsTexture;
   }
 
-  private init(): void {
-    this.setGeometry();
-    this.setTexture();
-    this.setMaterial();
-    this.setMesh();
-    if (this.debug.active) {
-      this.setDebug();
-    }
-  }
-
-  private setGeometry(): void {
+  protected setGeometry(): void {
     this.geometry = new THREE.SphereGeometry(this.radius, 64, 64);
   }
 
-  private setTexture(): void {
+  protected setTexture(): void {
     if (this.earthDayTexture) {
       this.earthDayTexture.colorSpace = THREE.SRGBColorSpace;
       this.earthDayTexture.anisotropy = 8;
@@ -117,7 +83,7 @@ export default class Earth implements SpaceObject {
     }
   }
 
-  private setMaterial(): void {
+  protected setMaterial(): void {
     this.surfaceMaterial = new THREE.ShaderMaterial({
       vertexShader: earthVertexShader,
       fragmentShader: earthFragmentShader,
@@ -155,7 +121,7 @@ export default class Earth implements SpaceObject {
     });
   }
 
-  private setMesh(): void {
+  protected setMesh(): void {
     this.group = new THREE.Group();
     this.surfaceMesh = new THREE.Mesh(this.geometry, this.surfaceMaterial);
 
@@ -165,12 +131,12 @@ export default class Earth implements SpaceObject {
     );
     this.atmosphereMesh.scale.set(1.04, 1.04, 1.04);
 
-    this.group.position.setFromSpherical(this.spherical);
+    this.group.position.copy(this.position);
     this.group.add(this.surfaceMesh, this.atmosphereMesh);
     this.scene.add(this.group);
   }
 
-  private setDebug(): void {
+  protected setDebug(): void {
     this.debugFolder = this.debug.ui?.addFolder("Earth");
     this.debugFolder?.addColor(this, "atmosphereDayColor").onChange(() => {
       this.surfaceMaterial?.uniforms.uAtmosphereDayColor.value.set(
@@ -199,23 +165,5 @@ export default class Earth implements SpaceObject {
             this.cloudsIntencity;
         }
       });
-    this.debugFolder
-      ?.add(this.spherical, "phi")
-      .min(0)
-      .max(Math.PI)
-      .step(0.001)
-      .onChange(() => this.updatePosition());
-    this.debugFolder
-      ?.add(this.spherical, "theta")
-      .min(-Math.PI)
-      .max(Math.PI)
-      .step(0.001)
-      .onChange(() => this.updatePosition());
-  }
-
-  private updatePosition(): void {
-    if (this.group) {
-      this.group.position.setFromSpherical(this.spherical);
-    }
   }
 }

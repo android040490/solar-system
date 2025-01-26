@@ -1,18 +1,10 @@
 import * as THREE from "three";
-import Experience from "../Experience";
 import vertexShader from "../../shaders/sun/vertex.glsl";
 import fragmentShader from "../../shaders/sun/fragment.glsl";
 import { BLOOM_SCENE } from "../Renderer";
-import Time from "../Utils/Time";
-import Resources from "../Utils/Resources";
-import { SpaceObject } from "../../models/space-object";
+import SpaceObject from "../../models/space-object";
 
-export default class Sun implements SpaceObject {
-  private readonly experience: Experience;
-  private readonly time: Time;
-  private readonly scene: THREE.Scene;
-  private readonly resources: Resources;
-
+export default class Sun extends SpaceObject {
   private lavaTexture?: THREE.Texture;
   private cloudTexture?: THREE.Texture;
   private geometry?: THREE.BufferGeometry;
@@ -20,16 +12,9 @@ export default class Sun implements SpaceObject {
   private mesh?: THREE.Mesh;
 
   private _position = new THREE.Vector3(0, 0, 0);
-  private radius = 20;
-
-  public readonly name = "Sun";
-  public readonly pointOfView = { x: 0, y: 0, z: 55 };
 
   constructor() {
-    this.experience = new Experience();
-    this.scene = this.experience.scene;
-    this.time = this.experience.time;
-    this.resources = this.experience.resources;
+    super({ name: "Sun", radius: 20 });
 
     this.loadTextures().then(() => this.init());
   }
@@ -44,14 +29,7 @@ export default class Sun implements SpaceObject {
     return this._position;
   }
 
-  private init(): void {
-    this.setGeometry();
-    this.setTexture();
-    this.setMaterial();
-    this.setMesh();
-  }
-
-  private setGeometry(): void {
+  protected setGeometry(): void {
     this.geometry = new THREE.IcosahedronGeometry(this.radius, 62);
   }
 
@@ -65,7 +43,7 @@ export default class Sun implements SpaceObject {
     this.cloudTexture = cloudTexture;
   }
 
-  private setTexture(): void {
+  protected setTexture(): void {
     if (this.lavaTexture) {
       this.lavaTexture.colorSpace = THREE.SRGBColorSpace;
       this.lavaTexture.wrapS = THREE.RepeatWrapping;
@@ -78,7 +56,7 @@ export default class Sun implements SpaceObject {
     }
   }
 
-  private setMaterial(): void {
+  protected setMaterial(): void {
     const uniforms = {
       fogDensity: { value: 0.45 },
       fogColor: { value: new THREE.Vector3(0, 0, 0) },
@@ -95,7 +73,7 @@ export default class Sun implements SpaceObject {
     });
   }
 
-  private setMesh(): void {
+  protected setMesh(): void {
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
     this.mesh.layers.enable(BLOOM_SCENE);

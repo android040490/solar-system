@@ -8,7 +8,6 @@ import World from "./World/World";
 import Resources from "./Utils/Resources";
 import Debug from "./Utils/Debug";
 import Navigator from "./World/Navigator";
-import SplashScreen from "./SplashScreen";
 import eventsManager, { EventsManager } from "./Utils/EventsManager";
 
 let instance: Experience;
@@ -24,7 +23,6 @@ export default class Experience {
   public readonly renderer!: Renderer;
   public readonly navigation!: Navigator;
   public readonly world!: World;
-  public readonly splashScreen!: SplashScreen;
   private readonly eventsManager: EventsManager = eventsManager;
 
   private stats?: Stats;
@@ -46,7 +44,6 @@ export default class Experience {
     this.time = new Time();
     this.scene = new THREE.Scene();
     this.resources = new Resources();
-    this.splashScreen = new SplashScreen();
     this.camera = new Camera();
     this.renderer = new Renderer();
     this.world = new World();

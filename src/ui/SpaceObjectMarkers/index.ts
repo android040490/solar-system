@@ -6,20 +6,7 @@ import { TimeEvent } from "../../core/Utils/Time";
 import Camera from "../../core/Camera";
 import Sizes from "../../core/Utils/Sizes";
 import classes from "./style.module.css";
-
-// function throttle<T extends (...args: any[]) => void>(
-//   func: T,
-//   delay: number,
-// ): T {
-//   let lastCall = 0;
-//   return function (this: unknown, ...args: Parameters<T>) {
-//     const now = Date.now();
-//     if (now - lastCall >= delay) {
-//       lastCall = now;
-//       func.apply(this, args);
-//     }
-//   } as T;
-// }
+import { throttle } from "../../helpers/optimizers";
 
 interface Marker {
   sourceObject: {
@@ -50,7 +37,7 @@ export class SpaceObjectMarkers extends HTMLElement {
     this.eventsManager = eventsManager;
 
     this.setListeners();
-    // this.update = throttle(this.update, 10); // TODO: maybe wrap update method in a throttle function for better performance if needed
+    this.update = throttle(this.update, 15);
   }
 
   private setListeners(): void {
@@ -82,6 +69,7 @@ export class SpaceObjectMarkers extends HTMLElement {
       marker.addEventListener("click", () => {
         this.experience.navigation.navigateTo(object);
       });
+      marker.style.willChange = "transform";
       this.appendChild(marker);
 
       this.markers.push({

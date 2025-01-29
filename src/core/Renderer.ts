@@ -36,7 +36,7 @@ export default class Renderer {
   });
   private readonly bloomParams = {
     threshold: 1,
-    strength: 0.7,
+    strength: 0.525,
     radius: 0,
   };
 

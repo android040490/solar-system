@@ -1,10 +1,10 @@
 import * as THREE from "three";
-import Experience from "../../Experience";
-import eventsManager, { EventsManager } from "../../Utils/EventsManager";
-import { ResourcesEvent } from "../../Utils/Resources";
-import { TimeEvent } from "../../Utils/Time";
-import Camera from "../../Camera";
-import Sizes from "../../Utils/Sizes";
+import Experience from "../../core/Experience";
+import eventsManager, { EventsManager } from "../../core/Utils/EventsManager";
+import { ResourcesEvent } from "../../core/Utils/Resources";
+import { TimeEvent } from "../../core/Utils/Time";
+import Camera from "../../core/Camera";
+import Sizes from "../../core/Utils/Sizes";
 import classes from "./style.module.css";
 
 // function throttle<T extends (...args: any[]) => void>(

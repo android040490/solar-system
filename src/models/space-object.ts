@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { NavigableObject } from "./navigation";
-import Experience from "../Experience/Experience";
-import Resources from "../Experience/Utils/Resources";
-import Time from "../Experience/Utils/Time";
-import Debug from "../Experience/Utils/Debug";
+import Experience from "../core/Experience";
+import Resources from "../core/Utils/Resources";
+import Time from "../core/Utils/Time";
+import Debug from "../core/Utils/Debug";
 
 export interface SpaceObjectOptions {
   radius: number;

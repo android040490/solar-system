@@ -6,7 +6,7 @@ import { TimeEvent } from "../../core/Utils/Time";
 import Camera from "../../core/Camera";
 import Sizes from "../../core/Utils/Sizes";
 import classes from "./style.module.css";
-import { throttle } from "../../helpers/optimizers";
+// import { throttle } from "../../helpers/optimizers";
 
 interface Marker {
   sourceObject: {
@@ -37,7 +37,7 @@ export class SpaceObjectMarkers extends HTMLElement {
     this.eventsManager = eventsManager;
 
     this.setListeners();
-    this.update = throttle(this.update, 15);
+    // this.update = throttle(this.update, 15);
   }
 
   private setListeners(): void {
@@ -95,10 +95,6 @@ export class SpaceObjectMarkers extends HTMLElement {
         continue;
       }
 
-      const translateX = screenPosition.x * this.sizes.width * 0.5;
-      const translateY = -screenPosition.y * this.sizes.height * 0.5;
-      element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
-
       const distanceToObject = sourceObject.position.distanceTo(
         this.camera.instance.position,
       );
@@ -122,6 +118,12 @@ export class SpaceObjectMarkers extends HTMLElement {
         !isIntersected && !isShortDistance,
       );
       element.classList.toggle(classes.clicable, !isIntersected);
+
+      if (!isIntersected) {
+        const translateX = screenPosition.x * this.sizes.width * 0.5;
+        const translateY = -screenPosition.y * this.sizes.height * 0.5;
+        element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+      }
     }
   }
 }

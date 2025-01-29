@@ -1,4 +1,4 @@
-import Experience from "./Experience/Experience";
-import "./Experience/UI";
+import Experience from "./core/Experience";
+import "./ui";
 
 new Experience();

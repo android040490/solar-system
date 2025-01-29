@@ -14,7 +14,7 @@ export default class Sun extends SpaceObject {
   private _position = new THREE.Vector3(0, 0, 0);
 
   constructor() {
-    super({ name: "Sun", radius: 20 });
+    super({ name: "Sun", radius: 20, markerColor: "#ffff00" });
 
     this.loadTextures().then(() => this.init());
   }
@@ -30,7 +30,7 @@ export default class Sun extends SpaceObject {
   }
 
   protected setGeometry(): void {
-    this.geometry = new THREE.IcosahedronGeometry(this.radius, 62);
+    this.geometry = new THREE.SphereGeometry(this.radius, 32, 32);
   }
 
   private async loadTextures(): Promise<void> {

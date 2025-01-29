@@ -1,35 +1,38 @@
 import Experience from "../Experience";
-import { ViewableObject } from "../../models/navigation";
+import { NavigableObject } from "../../models/navigation";
 import Camera from "../Camera";
 import GUI from "lil-gui";
 import Debug from "../Utils/Debug";
-import SpaceObject from "../../models/space-object";
 
 export default class Navigator {
   private readonly camera: Camera;
   private readonly debug: Debug;
-  private spaceObjects: SpaceObject[] = [];
+  private _navigableObjects: NavigableObject[] = [];
   private debugFolder?: GUI;
 
   constructor() {
     const experience = new Experience();
     this.camera = experience.camera;
     this.debug = experience.debug;
-    this.spaceObjects = experience.world.spaceObjects;
+    this._navigableObjects = experience.world.spaceObjects;
 
     if (this.debug.active) {
       this.setDebug();
     }
   }
 
-  navigateTo(viewableObject: ViewableObject): void {
-    this.camera.followObject(viewableObject);
+  get navigableObjects(): NavigableObject[] {
+    return this._navigableObjects;
+  }
+
+  navigateTo(object: NavigableObject): void {
+    this.camera.followObject(object);
   }
 
   private setDebug(): void {
     this.debugFolder = this.debug.ui?.addFolder("Navigator");
 
-    this.spaceObjects.forEach((spaceObject) => {
+    this._navigableObjects.forEach((spaceObject) => {
       const obj = {
         navigateTo: () => {
           this.navigateTo(spaceObject);

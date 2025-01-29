@@ -1,5 +1,5 @@
-import eventsManager, { EventsManager } from "../../Utils/EventsManager";
-import { ResourcesEvent } from "../../Utils/Resources";
+import eventsManager, { EventsManager } from "../../core/Utils/EventsManager";
+import { ResourcesEvent } from "../../core/Utils/Resources";
 import { ProgressBar } from "../ProgressBar";
 import classes from "./style.module.css";
 

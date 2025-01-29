@@ -3,7 +3,11 @@ import gsap from "gsap";
 import Experience from "./Experience";
 import { OrbitControls } from "three/addons/Addons.js";
 import Sizes from "./Utils/Sizes";
-import { ViewableObject } from "../models/navigation";
+
+interface FollowedObject {
+  position: THREE.Vector3;
+  radius: number;
+}
 
 export default class Camera {
   private readonly experience: Experience;
@@ -11,7 +15,7 @@ export default class Camera {
   private readonly scene: THREE.Scene;
   private readonly canvas: HTMLCanvasElement;
   private controls!: OrbitControls;
-  private _followedObject: ViewableObject | null = null;
+  private _followedObject: FollowedObject | null = null;
   private isTransitioning = false;
 
   instance!: THREE.PerspectiveCamera;
@@ -43,7 +47,7 @@ export default class Camera {
     this.controls.dispose();
   }
 
-  followObject(viewableObject: ViewableObject): void {
+  followObject(object: FollowedObject): void {
     if (this.isTransitioning) {
       return;
     }
@@ -62,12 +66,12 @@ export default class Camera {
       onUpdate: () => {
         this.transitionCameraPosition(
           initialCameraPosition,
-          viewableObject,
+          object,
           alpha.value,
         );
       },
       onComplete: () => {
-        this.followedObject = viewableObject;
+        this.followedObject = object;
         this.isTransitioning = false;
         this.controls.enabled = true;
       },
@@ -92,11 +96,11 @@ export default class Camera {
     this.controls.enableDamping = true;
   }
 
-  private set followedObject(value: ViewableObject | null) {
+  private set followedObject(value: FollowedObject | null) {
     this._followedObject = value;
     if (value) {
       const distance = this.instance.position.distanceTo(this.controls.target);
-      this.controls.maxDistance = distance;
+      this.controls.maxDistance = distance * 10;
       this.controls.minDistance = value.radius + 1;
     } else {
       this.controls.maxDistance = 100000;
@@ -106,10 +110,10 @@ export default class Camera {
 
   private transitionCameraPosition(
     initialCameraPosition: THREE.Vector3,
-    viewableObject: ViewableObject,
+    object: FollowedObject,
     alpha: number,
   ): void {
-    const { position, radius } = viewableObject;
+    const { position, radius } = object;
     const newCameraPosition = new THREE.Vector3().lerpVectors(
       initialCameraPosition,
       position.clone().add(new THREE.Vector3(0, 0, radius * 5)),

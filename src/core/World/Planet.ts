@@ -38,7 +38,7 @@ export default class Planet extends OrbitalObject {
   }
 
   protected setGeometry(): void {
-    this.geometry = new THREE.SphereGeometry(this.radius, 64, 64);
+    this.geometry = new THREE.SphereGeometry(this.radius, 48, 48);
   }
 
   protected setTexture(): void {

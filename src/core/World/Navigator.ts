@@ -7,14 +7,14 @@ import Debug from "../Utils/Debug";
 export default class Navigator {
   private readonly camera: Camera;
   private readonly debug: Debug;
-  private _navigableObject: NavigableObject[] = [];
+  private _navigableObjects: NavigableObject[] = [];
   private debugFolder?: GUI;
 
   constructor() {
     const experience = new Experience();
     this.camera = experience.camera;
     this.debug = experience.debug;
-    this._navigableObject = experience.world.spaceObjects;
+    this._navigableObjects = experience.world.spaceObjects;
 
     if (this.debug.active) {
       this.setDebug();
@@ -22,7 +22,7 @@ export default class Navigator {
   }
 
   get navigableObjects(): NavigableObject[] {
-    return this._navigableObject;
+    return this._navigableObjects;
   }
 
   navigateTo(object: NavigableObject): void {
@@ -32,7 +32,7 @@ export default class Navigator {
   private setDebug(): void {
     this.debugFolder = this.debug.ui?.addFolder("Navigator");
 
-    this._navigableObject.forEach((spaceObject) => {
+    this._navigableObjects.forEach((spaceObject) => {
       const obj = {
         navigateTo: () => {
           this.navigateTo(spaceObject);

@@ -34,6 +34,7 @@ export default class World {
         parentObject: this._sun,
         orbitSpeed: Math.random() * 0.1, // TODO: change this to not be hardcoded and avoid code duplication, maybe create a planet factory
         offsetAngle: Math.random() * Math.PI * 2, // TODO: change this to not be hardcoded and avoid code duplication, maybe create a planet factory
+        markerColor: "#696969",
       }),
       new Planet({
         name: "Venus",
@@ -43,6 +44,7 @@ export default class World {
         parentObject: this._sun,
         orbitSpeed: Math.random() * 0.1,
         offsetAngle: Math.random() * Math.PI * 2,
+        markerColor: "#eea046",
       }),
       new Earth({
         parentObject: this._sun,
@@ -55,6 +57,7 @@ export default class World {
         parentObject: this._sun,
         orbitSpeed: Math.random() * 0.1,
         offsetAngle: Math.random() * Math.PI * 2,
+        markerColor: "#d3613f",
       }),
       new Planet({
         name: "Jupiter",
@@ -64,6 +67,7 @@ export default class World {
         parentObject: this._sun,
         orbitSpeed: Math.random() * 0.1,
         offsetAngle: Math.random() * Math.PI * 2,
+        markerColor: "#696158",
       }),
     ];
   }

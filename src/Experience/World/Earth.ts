@@ -36,6 +36,7 @@ export default class Earth extends OrbitalObject {
       orbitRadius: 500,
       orbitSpeed: Math.random() * 0.1, // TODO: change this to not be hardcoded
       offsetAngle: Math.random() * Math.PI * 2, // TODO: change this to not be hardcoded
+      markerColor: "#2e6faf",
     });
 
     this.sunPosition =

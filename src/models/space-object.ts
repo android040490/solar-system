@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { ViewableObject } from "./navigation";
+import { NavigableObject } from "./navigation";
 import Experience from "../Experience/Experience";
 import Resources from "../Experience/Utils/Resources";
 import Time from "../Experience/Utils/Time";
@@ -8,9 +8,10 @@ import Debug from "../Experience/Utils/Debug";
 export interface SpaceObjectOptions {
   radius: number;
   name: string;
+  markerColor?: string;
 }
 
-export default abstract class SpaceObject implements ViewableObject {
+export default abstract class SpaceObject implements NavigableObject {
   protected abstract setGeometry(): void;
   protected abstract setTexture(): void;
   protected abstract setMaterial(): void;
@@ -24,14 +25,16 @@ export default abstract class SpaceObject implements ViewableObject {
 
   public readonly name: string;
   public readonly radius: number;
+  public readonly markerColor?: string;
   public abstract position: THREE.Vector3;
 
   public abstract update(): void;
 
   constructor(options: SpaceObjectOptions) {
-    const { radius, name } = options;
+    const { radius, name, markerColor } = options;
     this.radius = radius;
     this.name = name;
+    this.markerColor = markerColor;
 
     this.experience = new Experience();
     this.scene = this.experience.scene;

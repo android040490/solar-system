@@ -6,7 +6,7 @@ import { TimeEvent } from "../../core/Utils/Time";
 import Camera from "../../core/Camera";
 import Sizes from "../../core/Utils/Sizes";
 import classes from "./style.module.css";
-// import { throttle } from "../../helpers/optimizers";
+import { throttle } from "../../helpers/optimizers";
 
 interface Marker {
   sourceObject: {
@@ -37,7 +37,7 @@ export class SpaceObjectMarkers extends HTMLElement {
     this.eventsManager = eventsManager;
 
     this.setListeners();
-    // this.update = throttle(this.update, 15);
+    this.update = throttle(this.update, 15);
   }
 
   private setListeners(): void {
